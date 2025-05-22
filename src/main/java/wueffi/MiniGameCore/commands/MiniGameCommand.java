@@ -57,7 +57,7 @@ public class MiniGameCommand implements CommandExecutor {
             StringBuilder availableCommands = new StringBuilder("§fUsage: §6/mg <");
 
             for (String command: commands_permissions.keySet()) {
-                if (LuckPermsUtil.hasPermission(player, commands_permissions.get(command))) {
+                if (player.hasPermission(commands_permissions.get(command))) {
                     availableCommands.append(command).append(" | ");
                 }
             }
@@ -79,7 +79,7 @@ public class MiniGameCommand implements CommandExecutor {
                     player.sendMessage("§cMissing Args! Usage: /mg host <game>");
                     return true;
                 }
-                if (!LuckPermsUtil.hasPermission(player, "mgcore.host")) {
+                if (!player.hasPermission("mgcore.host")) {
                     player.sendMessage("§cYou have no permissions to use this Command!");
                     return true;
                 }
@@ -181,7 +181,7 @@ public class MiniGameCommand implements CommandExecutor {
 
 
             case "start":
-                if (!LuckPermsUtil.hasPermission(player, "mgcore.start")) {
+                if (!player.hasPermission("mgcore.start")) {
                     player.sendMessage("§cYou have no permissions to use this command!");
                     return true;
                 }
@@ -205,7 +205,7 @@ public class MiniGameCommand implements CommandExecutor {
                     player.sendMessage("§cMissing Args! Usage: /mg spectate <game|player>");
                     return true;
                 }
-                if (!LuckPermsUtil.hasPermission(player, "mgcore.spectate")) {
+                if (!player.hasPermission("mgcore.spectate")) {
                     player.sendMessage("§cYou have no permissions to use this Command!");
                     return true;
                 }
@@ -258,7 +258,7 @@ public class MiniGameCommand implements CommandExecutor {
                 break;
 
             case "reload":
-                if (!LuckPermsUtil.hasPermission(player, "mgcore.admin")) {
+                if (!player.hasPermission("mgcore.admin")) {
                     player.sendMessage("§cYou have no permissions to use this Command!");
                     return true;
                 }
@@ -268,7 +268,7 @@ public class MiniGameCommand implements CommandExecutor {
                 break;
 
             case "stopall":
-                if (!LuckPermsUtil.hasPermission(player, "mgcore.admin")) {
+                if (!player.hasPermission("mgcore.admin")) {
                     player.sendMessage("§cYou have no permissions to use this Command!");
                     return true;
                 }
@@ -288,7 +288,7 @@ public class MiniGameCommand implements CommandExecutor {
                 break;
 
             case "stop":
-                if (!LuckPermsUtil.hasPermission(player, "mgcore.admin")) {
+                if (!player.hasPermission("mgcore.admin")) {
                     player.sendMessage("§cNo permission!");
                     return true;
                 }
@@ -311,7 +311,7 @@ public class MiniGameCommand implements CommandExecutor {
                 break;
 
             case "ban":
-                if (!LuckPermsUtil.hasPermission(player, "mgcore.admin")) {
+                if (!player.hasPermission("mgcore.admin")) {
                     player.sendMessage("§cYou don't have permissions to use this Command!");
                     return true;
                 }
@@ -332,7 +332,7 @@ public class MiniGameCommand implements CommandExecutor {
                 break;
 
             case "unban":
-                if (!LuckPermsUtil.hasPermission(player, "mgcore.admin")) {
+                if (!player.hasPermission("mgcore.admin")) {
                     player.sendMessage("§cYou don't have permissions to use this Command!");
                     return true;
                 }
