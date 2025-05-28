@@ -26,31 +26,30 @@ public class MiniGameTabCompleter implements TabCompleter {
         }
 
         List<String> completions = new ArrayList<>();
-        LobbyManager lobbyManager = LobbyManager.getInstance();
 
-        String[] commands = {"host", "join", "leave", "start", "spectate", "stats", "reload", "stopall", "stop", "ban", "unban"};
+        String[] commands = {"host", "join", "ready", "unready", "confirm", "leave", "start", "spectate", "stats", "reload", "stopall", "stop", "ban", "unban"};
         String[] permissions = {
-                "mgcore.host", "mgcore.join", "mgcore.leave", "mgcore.start", "mgcore.spectate", "mgcore.stats",
-                "mgcore.admin", "mgcore.admin", "mgcore.admin", "mgcore.admin", "mgcore.admin"
+                "mgcore.host", "mgcore.join", "mgcore.ready", "mgcore.ready", "mgcore.confirm", "mgcore.leave", "mgcore.start",
+                "mgcore.spectate", "mgcore.stats", "mgcore.admin", "mgcore.admin", "mgcore.admin", "mgcore.admin", "mgcore.admin"
         };
 
         if (args.length == 1) {
             for (int i = 0; i < commands.length; i++) {
-                if (LuckPermsUtil.hasPermission(player, permissions[i])) {
+                if (player.hasPermission(permissions[i])) {
                     completions.add(commands[i]);
                 }
             }
         } else if (args.length == 2) {
             switch (args[0].toLowerCase()) {
                 case "host":
-                    if (LuckPermsUtil.hasPermission(player, "mgcore.host")) {
+                    if (player.hasPermission("mgcore.host")) {
                         if (!plugin.getBannedPlayers().contains(player.getName())) {
                             completions = plugin.getAvailableGames();
                         }
                     }
                     break;
                 case "join":
-                    if (LuckPermsUtil.hasPermission(player, "mgcore.join")) {
+                    if (player.hasPermission("mgcore.join")) {
                         if (!plugin.getBannedPlayers().contains(player.getName())) {
                             completions = new ArrayList<>();
                             for (Lobby lobby : LobbyManager.getInstance().getOpenLobbies()) {
@@ -61,7 +60,7 @@ public class MiniGameTabCompleter implements TabCompleter {
                     }
                     break;
                 case "spectate":
-                    if (LuckPermsUtil.hasPermission(player, "mgcore.spectate")) {
+                    if (player.hasPermission("mgcore.spectate")) {
                         completions = Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
                         for (Lobby lobby : LobbyManager.getInstance().getOpenLobbies()) {
                             String lobbyId = lobby.getLobbyId();
@@ -70,14 +69,14 @@ public class MiniGameTabCompleter implements TabCompleter {
                     }
                     break;
                 case "stats":
-                    if (LuckPermsUtil.hasPermission(player, "mgcore.stats")) {
+                    if (player.hasPermission("mgcore.stats")) {
                         completions = Bukkit.getOnlinePlayers().stream()
                                 .map(Player::getName)
                                 .collect(Collectors.toList());
                     }
                     break;
                 case "stop":
-                    if (LuckPermsUtil.hasPermission(player, "mgcore.admin")) {
+                    if (player.hasPermission("mgcore.admin")) {
                         completions = new ArrayList<>();
                         for (Lobby lobby : LobbyManager.getInstance().getOpenLobbies()) {
                             String lobbyId = lobby.getLobbyId();
@@ -86,7 +85,7 @@ public class MiniGameTabCompleter implements TabCompleter {
                     }
                     break;
                 case "ban", "unban":
-                    if (LuckPermsUtil.hasPermission(player, "mgcore.admin")) {
+                    if (player.hasPermission("mgcore.admin")) {
                         completions = Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
                     }
                     break;

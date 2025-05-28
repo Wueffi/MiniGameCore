@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
+import wueffi.MiniGameCore.managers.LobbyManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +24,7 @@ public class ScoreBoard {
 
         int count = alive != null ? alive.size() : 0;
 
-        obj.getScore("§fAlive: §a" + count).setScore(count + 4);
+        obj.getScore("§fAlive: §a" + count + "/" + LobbyManager.getLobbyByPlayer(player).getPlayers().size()).setScore(count + 4);
         obj.getScore("§f───────────────").setScore(count + 3);
 
         if (alive == null || alive.isEmpty()) {
@@ -36,7 +37,7 @@ public class ScoreBoard {
 
         obj.getScore("§r§f").setScore(2);
         obj.getScore("§7─────────────────").setScore(1);
-        obj.getScore("§7Made by Waffle").setScore(0);
+        obj.getScore("§7Made with ❤ by Waffle").setScore(0);
 
         player.setScoreboard(board);
     }
@@ -50,20 +51,24 @@ public class ScoreBoard {
         int maxPlayers = lobby.getMaxPlayers();
 
         obj.getScore("§r").setScore(players.size() + 6);
-        obj.getScore("§fPlayers: §a" + players.size() + "/" + maxPlayers).setScore(players.size() + 5);
+        obj.getScore("§fPlayers: §a" + players.size() + "/" + maxPlayers + " | Ready: " + lobby.getReadyPlayers().size() + "/" + lobby.getPlayers().size()).setScore(players.size() + 5);
         obj.getScore("§f───────────────").setScore(players.size() + 4);
 
         if (players.isEmpty()) {
             obj.getScore("§cNo players yet!").setScore(3);
         } else {
             for (int i = 0; i < players.size(); i++) {
-                obj.getScore("§f- " + players.get(i).getName()).setScore(players.size() - i + 2);
+                if (!lobby.getReadyPlayers().contains(player)) {
+                    obj.getScore("§f- " + players.get(i).getName()).setScore(players.size() - i + 2);
+                } else {
+                    obj.getScore("§f- §a" + players.get(i).getName()).setScore(players.size() - i + 2);
+                }
             }
         }
 
         obj.getScore("§r§f").setScore(2);
         obj.getScore("§7─────────────────").setScore(1);
-        obj.getScore("§7Made by Waffle").setScore(0);
+        obj.getScore("§7Made with ❤ by Waffle").setScore(0);
 
         player.setScoreboard(board);
     }
@@ -85,11 +90,10 @@ public class ScoreBoard {
                 obj.getScore("§4").setScore(4);
                 obj.getScore("§5").setScore(3);
             } else {
-                int score = openLobbies.size() + closedLobbies.size() + 3;
+                int score = 10 + Math.max(0, openLobbies.size() - 3) + Math.max(0, closedLobbies.size() - 3); // crazy calculations ikr
                 obj.getScore(title).setScore(score--);
                 obj.getScore("§2§lOpen Lobbies:").setScore(score--);
                 for (Lobby lobby : openLobbies) {
-                    obj.getScore("§a- " + lobby.getLobbyId()).setScore(score--);
                     if (openLobbies.size() <= 3) {
                         obj.getScore("§6- " + lobby.getLobbyId()).setScore(score--);
                     }
@@ -130,7 +134,7 @@ public class ScoreBoard {
 
         obj.getScore("§r§f").setScore(2);
         obj.getScore("§7─────────────────").setScore(1);
-        obj.getScore("§7Made by Waffle").setScore(0);
+        obj.getScore("§7Made with ❤ by Waffle").setScore(0);
 
         player.setScoreboard(board);
     }

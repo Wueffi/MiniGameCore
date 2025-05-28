@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class LobbyManager {
     private static final LobbyManager instance = new LobbyManager();
@@ -49,13 +50,13 @@ public class LobbyManager {
 
     public List<Lobby> getOpenLobbies() {
         return lobbies.values().stream()
-                .filter(lobby -> !lobby.isFull())
+                .filter(lobby -> Objects.equals(lobby.getLobbyState(), "WAITING"))
                 .toList();
     }
 
     public List<Lobby> getClosedLobbies() {
         return lobbies.values().stream()
-                .filter(Lobby::isFull)
+                .filter(lobby -> Objects.equals(lobby.getLobbyState(), "GAME"))
                 .toList();
     }
 }

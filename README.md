@@ -51,19 +51,19 @@ banned-players:
 ### Loading Game-Worlds & Configuring them
 The Folder for Gameworlds and configs is `./MiniGameCore`. Every Game World should be named like this: `<Game name>_world`. The world configs are named `config.yml` and should be located in the Game's world folder.
 
-All available options:
-| Key                   | Type                              | Description                                                                 | Needed                     |
-|-----------------------|-----------------------------------|-----------------------------------------------------------------------------|----------------------------|
-| `name`                | `String`                          | Display name of the game, e.g. in the scoreboard or at `/mg host`           | ✅ Yes                     |
-| `maxPlayers`          | `Integer`                         | Maximum number of players for this game instance                            | ✅ Yes                     |
-| `teams`               | `Integer`                         | Maximum number of teams                                                     | ❌ No (default: 0)         |
-| `spawnPoints`         | `List<Location>`                  | Default spawn points for players without a team                             | ✅ Depends                 |
-| `teamSpawnPoints`     | `Map<Team, List<Location>>`       | Spawn points per team (e.g. `0: [...]`, `1: [...]`)                         | ✅ Depends                 |
-| `inventory`           | `List<ItemStack>`                 | Starting items at game start (e.g. `["WOODEN_SHOVEL"]`)                     | ❌ No                      |
-| `allowed_break_blocks`| `List<String>`                    | Which blocks can be broken (e.g. `["SNOW_BLOCK"]`)                          | ❌ No                      |
-| `respawnMode`         | `String`                          | Control of respawn behavior: `"true"` or `"false"`                          | ❌ No (default: false)     |
-| `respawnDelay`        | `Integer`                         | Seconds delay until respawn (if enabled)                                    | ❌ No (default: 0)         |
+All available options: 
 
+| Field | Description | Required / Default |
+|-------|-------------|--------------------|
+| `name` | Display name of the game, e.g. in the scoreboard or at `/mg host` | ✅ Yes |
+| `maxPlayers` | Maximum number of players for this game instance | ✅ Yes |
+| `teams` | Maximum number of teams | ❌ No (default: 0) |
+| `spawnPoints` | Default spawn points for players without a team | ✅ Depends |
+| `teamSpawnPoints` | Spawn points per team (e.g. `0: [...]`, `1: [...]`) | ✅ Depends |
+| `inventory` | Starting items at game start (e.g. `["WOODEN_SHOVEL"]`) | ❌ No |
+| `allowed_break_blocks` | Which blocks can be broken (e.g. `["SNOW_BLOCK"]`) | ❌ No |
+| `respawnMode` | Control of respawn behavior: `"true"` or `"false"` | ❌ No (default: false) |
+| `respawnDelay` | Seconds delay until respawn (if enabled) | ❌ No (default: 0) |
 
 Example config for an 8 player Spleef-Game:
 ```

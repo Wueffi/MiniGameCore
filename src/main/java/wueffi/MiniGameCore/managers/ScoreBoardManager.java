@@ -70,7 +70,6 @@ public class ScoreBoardManager implements Listener {
                         Lobbymanager.getOpenLobbies(),
                         Lobbymanager.getClosedLobbies()
                 );
-
         }
     }
 

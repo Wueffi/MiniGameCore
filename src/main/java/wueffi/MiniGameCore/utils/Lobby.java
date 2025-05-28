@@ -15,6 +15,7 @@ public class Lobby {
     private final Set<Player> players = new HashSet<>();
     private final Player owner;
     private final File worldFolder;
+    private final Set<Player> readyPlayers = new HashSet<>();
     private String lobbyState;
 
     public Lobby(String lobbyId, String gameName, int maxPlayers, Player owner, File worldFolder, String LobbyState) {
@@ -43,6 +44,14 @@ public class Lobby {
         return players.remove(player);
     }
 
+    public boolean ready(Player player) {
+        return readyPlayers.add(player);
+    }
+
+    public boolean unready(Player player) {
+        return readyPlayers.remove(player);
+    }
+
     public String getLobbyState() {
         return lobbyState;
     }
@@ -61,6 +70,10 @@ public class Lobby {
 
     public Set<Player> getPlayers() {
         return players;
+    }
+
+    public Set<Player> getReadyPlayers() {
+        return readyPlayers;
     }
 
     public String getLobbyId() {
