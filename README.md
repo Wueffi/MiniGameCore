@@ -20,6 +20,9 @@
 |----------------------------------------|------------------------------------------------|-------------------------------|
 | `/mg host <game>` | Creates a new lobby | `mgcore.host` |
 | `/mg join <lobby-id>` | Join the lobby | `mgcore.join` |
+| `/mg ready` | Set your Status as Ready | `mgcore.ready` |
+| `/mg unready` | Set your Status as not Ready | `mgcore.unready` |
+| `/mg confirm` | Confirm an action | `mgcore.confirm` |
 | `/mg leave` | Leave the lobby or game | `mgcore.leave` |
 | `/mg start` | Start the game manually (if allowed) | `mgcore.start` |
 | `/mg spectate <lobby-id\|player>` | Join a game as a spectator | `mgcore.spectate` |
@@ -62,6 +65,7 @@ All available options:
 | `allowed_break_blocks` | Which blocks can be broken (e.g. `["SNOW_BLOCK"]`) | ❌ No |
 | `respawnMode` | Control of respawn behavior: `"true"` or `"false"` | ❌ No (default: false) |
 | `respawnDelay` | Seconds delay until respawn (if enabled) | ❌ No (default: 0) |
+| `doDurability` | Control ItemDamage: `true` (vanilla) or `false` | ❌ No (default: true) |
 
 Example config for an 8 player Spleef-Game:
 ```
@@ -107,4 +111,5 @@ game:
   allowed_break_blocks:
     - "snow_block"
   respawnMode: false
+  doDurability: false
 ```
