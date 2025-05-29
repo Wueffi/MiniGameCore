@@ -9,8 +9,7 @@
 
 1. Download the latest `.jar` from [Modrinth](https://modrinth.com/plugin/minigamecore) or Releases.
 2. Place the file in the `plugins/` folder of your Minecraft server.
-3. Ensure the following plugins are installed:
-[LuckPerms](https://luckperms.net/) (for permissions management)
+3. For permission-management, you can optionally use a plugin like [LuckPerms](https://luckperms.net/).
 4. Restart the server once.
 
 
