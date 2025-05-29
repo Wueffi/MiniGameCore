@@ -21,6 +21,8 @@ public class GameConfig {
     private final List<TeamSpawnPoints> teamSpawnPoints = new ArrayList<>();
     private final List<Material> startInventory = new ArrayList<>();
     private final Set<Material> allowedBreakBlocks = new HashSet<>();
+    private final Set<Material> allowedPlaceBlocks = new HashSet<>();
+    private final boolean doDurability;
 
     public GameConfig(File configFile) {
         this.config = YamlConfiguration.loadConfiguration(configFile);
@@ -30,6 +32,7 @@ public class GameConfig {
         this.teams = config.getInt("game.teams", 0);
         this.RespawnMode = config.getBoolean("game.respawnMode", false);
         this.RespawnDelay = config.getInt("game.respawnDelay", 0);
+        this.doDurability = config.getBoolean("game.doDurability", true);
 
         if (config.contains("game.spawnPoints")) {
             for (String key : config.getConfigurationSection("game.spawnPoints").getKeys(false)) {
@@ -71,6 +74,15 @@ public class GameConfig {
             }
         }
 
+        if (config.contains("game.allowed_place_blocks")) {
+            for (String block : config.getStringList("game.allowed_place_blocks")) {
+                Material material = Material.getMaterial(block.toUpperCase());
+                if (material != null) {
+                    allowedPlaceBlocks.add(material);
+                }
+            }
+        }
+
     }
 
     public String getGameName() {
@@ -101,8 +113,16 @@ public class GameConfig {
         return allowedBreakBlocks;
     }
 
+    public Set<Material> getAllowedPlaceBlocks() {
+        return allowedPlaceBlocks;
+    }
+
     public boolean getRespawnMode() {
         return RespawnMode;
+    }
+
+    public boolean getDurabilityMode() {
+        return doDurability;
     }
 
     public Integer getRespawnDelay() {
