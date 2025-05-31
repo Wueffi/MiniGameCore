@@ -10,6 +10,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -60,6 +62,7 @@ public class GameManager implements Listener {
     }
 
     private static void startCountdown(Lobby lobby) {
+        lobby.setLobbyState("COUNTDOWN");
         GameConfig gameConfig = loadGameConfigFromWorld(lobby.getWorldFolder());
         List<Player> players = new ArrayList<>(lobby.getPlayers());
         List<List<Player>> teams = new ArrayList<>();
@@ -124,6 +127,7 @@ public class GameManager implements Listener {
                     }
                     timeLeft--;
                 } else {
+                    lobby.setLobbyState("GAME");
                     for (Player player : lobby.getPlayers()) {
                         player.sendTitle("§aGame Started!", "§cTeaming / Cheating is bannable!");
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1.0f, 5.0f);
@@ -381,6 +385,24 @@ public class GameManager implements Listener {
             if (!config.getPVPMode()) {
                 event.setCancelled(true);
                 damager.sendMessage("§8[§6MiniGameCore§8]§c You are not allowed to PVP");
+            }
+        }
+    }
+
+    @EventHandler
+    public void catchContainerOpen(InventoryOpenEvent event)
+    {
+        if(!event.getInventory().getType().equals(InventoryType.PLAYER))
+        {
+            final Player player = (Player) event.getPlayer();
+            Lobby lobby = LobbyManager.getLobbyByPlayer(player);
+            if (lobby == null) {
+                event.setCancelled(false);
+                return;
+            }
+            if (!Objects.equals(lobby.getLobbyState(), "GAME")) {
+                player.sendMessage("§8[§6MiniGameCore§8]§c You can't open Containers yet!");
+                event.setCancelled(true);
             }
         }
     }

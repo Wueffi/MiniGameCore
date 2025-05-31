@@ -183,7 +183,6 @@ public class MiniGameCommand implements CommandExecutor {
                 }
                 player.sendMessage("§8[§6MiniGameCore§8] §aStarting game: " + confirmLobby.getLobbyId());
                 GameManager.startGame(confirmLobby);
-                confirmLobby.setLobbyState("GAME");
 
             case "ready":
                 if (!player.hasPermission("mgcore.ready")) {
@@ -297,7 +296,6 @@ public class MiniGameCommand implements CommandExecutor {
                     return true;
                 }
                 GameManager.startGame(lobby);
-                lobby.setLobbyState("GAME");
                 player.sendMessage("§8[§6MiniGameCore§8] §aStarting game: " + lobby.getLobbyId());
                 break;
 
