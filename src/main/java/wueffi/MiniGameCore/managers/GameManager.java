@@ -27,7 +27,7 @@ import static org.bukkit.Bukkit.getLogger;
 
 public class GameManager implements Listener {
     static final Map<Lobby, List<Player>> alivePlayers = new HashMap<>();
-    private static final Set<Player> frozenPlayers = new HashSet<>();
+    public static final Set<Player> frozenPlayers = new HashSet<>();
     static Map<UUID, Location> playerRespawnPoints = new HashMap<>();
     private static MiniGameCore plugin;
 
@@ -196,6 +196,7 @@ public class GameManager implements Listener {
         } else {
             Location spawnLocation = newWorld.getSpawnLocation();
             player.teleport(spawnLocation);
+            PlayerHandler.PlayerSoftReset(player);
             player.setGameMode(GameMode.SURVIVAL);
         }
 
@@ -259,7 +260,7 @@ public class GameManager implements Listener {
         }
         GameConfig config = loadGameConfigFromWorld(lobby.getWorldFolder());
 
-        if (!config.getAllowedBreakBlocks().contains(event.getBlock().getType()) || frozenPlayers.contains(player)) {
+        if (!config.getAllowedBreakBlocks().contains(event.getBlock().getType()) || frozenPlayers.contains(player) || lobby.getLobbyState().equals("WAITING")) {
             player.sendMessage("§8[§6MiniGameCore§8]§c You are not allowed to break this block!");
             event.setCancelled(true);
         }
@@ -291,9 +292,11 @@ public class GameManager implements Listener {
 
             GameConfig config = loadGameConfigFromWorld(lobby.getWorldFolder());
 
-            World lobbyWorld = Bukkit.getWorld(lobby.getWorldFolder().getName());
-            if (lobbyWorld != null) {
+            final World lobbyWorld = Bukkit.getWorld(lobby.getWorldFolder().getName());
+            try {
                 player.teleport(lobbyWorld.getSpawnLocation());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
             if (!config.getRespawnMode()) {
                 player.sendMessage("§8[§6MiniGameCore§8]§c You died! §aYou are now spectating.");
@@ -343,7 +346,7 @@ public class GameManager implements Listener {
 
         GameConfig config = loadGameConfigFromWorld(lobby.getWorldFolder());
 
-        if (!config.getAllowedPlaceBlocks().contains(event.getBlock().getType()) || frozenPlayers.contains(player)) {
+        if (!config.getAllowedPlaceBlocks().contains(event.getBlock().getType()) || frozenPlayers.contains(player) || lobby.getLobbyState().equals("WAITING")) {
             player.sendMessage("§8[§6MiniGameCore§8]§c You are not allowed to place this block!");
             event.setCancelled(true);
         }
@@ -382,7 +385,7 @@ public class GameManager implements Listener {
             }
 
             GameConfig config = loadGameConfigFromWorld(lobby.getWorldFolder());
-            if (!config.getPVPMode()) {
+            if (!config.getPVPMode() && Objects.equals(lobby.getLobbyState(), "GAME")) {
                 event.setCancelled(true);
                 damager.sendMessage("§8[§6MiniGameCore§8]§c You are not allowed to PVP");
             }

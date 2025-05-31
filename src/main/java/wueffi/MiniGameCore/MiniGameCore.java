@@ -31,7 +31,6 @@ public class MiniGameCore extends JavaPlugin {
                 bannedPlayers.add(uuid);
             } catch (IllegalArgumentException e) {
                 plugin.getLogger().warning("Found invalid UUID in banned players list " + UUIDstring + ". Ignoring.");
-                continue;
             }
         }
         this.availableGames = availableGames;
@@ -64,6 +63,7 @@ public class MiniGameCore extends JavaPlugin {
             LobbyHandler.LobbyReset(LobbyManager.getInstance().getLobby(lobbyid));
             getLogger().info("Shut down Lobby: " + lobbyid);
         }
+        GameManager.frozenPlayers.clear();
         getLogger().info("MinigameCore disabled!");
     }
 

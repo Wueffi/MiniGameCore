@@ -1,8 +1,6 @@
 package wueffi.MiniGameCore.commands;
 
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -143,14 +141,20 @@ public class MiniGameCommand implements CommandExecutor {
                     return true;
                 }
                 for (Player gamer : lobby.getPlayers()) {
-                    gamer.sendMessage("§8[§6MiniGameCore§8]§a " + player.getName() + " joined! " +
-                            lobby.getPlayers().size() + "/" + lobby.getMaxPlayers() + " players.");
-                    player.teleport(lobby.getOwner());
-                    PlayerHandler.PlayerSoftReset(player);
-                    player.setGameMode(GameMode.SURVIVAL);
-                    ScoreBoardManager.setPlayerStatus(player, "WAITING");
-                    player.sendMessage("§8[§6MiniGameCore§8]§a If you are ready use /mg ready to ready-up!");
+                    gamer.sendMessage("§8[§6MiniGameCore§8]§a " + player.getName() + " joined! " + lobby.getPlayers().size() + "/" + lobby.getMaxPlayers() + " players.");
                 }
+                World world = Bukkit.getWorld(lobby.getWorldFolder().getName());
+                if (world == null) {
+                    getLogger().warning("World was null! Teleporting to Owner instead. Lobby: " + lobby.getLobbyId() + ", State: " + lobby.getLobbyState());
+                    player.teleport(lobby.getOwner().getLocation());
+                } else {
+                    Location spawnLocation = world.getSpawnLocation();
+                    player.teleport(spawnLocation);
+                }
+                PlayerHandler.PlayerSoftReset(player);
+                player.setGameMode(GameMode.SURVIVAL);
+                ScoreBoardManager.setPlayerStatus(player, "WAITING");
+                player.sendMessage("§8[§6MiniGameCore§8]§a If you are ready use /mg ready to ready-up!");
                 break;
 
             case "confirm":
@@ -259,7 +263,7 @@ public class MiniGameCommand implements CommandExecutor {
                         gamer.sendMessage("§8[§6MiniGameCore§8]§a " + player.getName() + " left the Lobby! " + lobby.getPlayers().size() + "/" + lobby.getMaxPlayers() + " players.");
                     }
 
-                    if (lobby.isOwner(player)) {
+                    if (lobby.isOwner(player) || lobby.getPlayers().isEmpty()) {
                         player.sendMessage("§8[§6MiniGameCore§8] §cYou were the owner of this lobby. The game will now be stopped.");
                         for (Player gamer : lobby.getPlayers()) {
                             gamer.sendMessage("§8[§6MiniGameCore§8]§c Lobby Owner " + player.getName() + " left the Lobby! Resetting...");
@@ -319,11 +323,13 @@ public class MiniGameCommand implements CommandExecutor {
                 if (targetPlayer != null && targetPlayer.isOnline()) {
                     player.sendMessage("§8[§6MiniGameCore§8] §aYou are now spectating " + targetPlayer.getName() + ".");
                     player.teleport(targetPlayer);
+                    player.setGameMode(GameMode.SPECTATOR);
                 } else {
                     lobby = LobbyManager.getInstance().getLobby(target);
                     if (lobby != null) {
                         player.sendMessage("§8[§6MiniGameCore§8] §aYou are now spectating the lobby of " + lobby.getOwner().getName() + ".");
                         player.teleport(lobby.getOwner());
+                        player.setGameMode(GameMode.SPECTATOR);
                     } else {
                         player.sendMessage("§8[§6MiniGameCore§8]§cNo player or lobby found with that name.");
                     }

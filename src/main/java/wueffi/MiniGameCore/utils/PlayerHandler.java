@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import wueffi.MiniGameCore.managers.GameManager;
 import wueffi.MiniGameCore.managers.LobbyManager;
 
 
@@ -18,7 +19,7 @@ public class PlayerHandler implements Listener {
 
         if (lobby != null) {
             lobby.removePlayer(player);
-            if (lobby.getPlayers() == null) {
+            if (lobby.getPlayers().isEmpty()) {
                 LobbyHandler.LobbyReset(lobby);
             }
         }
@@ -48,5 +49,6 @@ public class PlayerHandler implements Listener {
     public void onPlayerLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         PlayerReset(player);
+        GameManager.frozenPlayers.remove(player);
     }
 }
