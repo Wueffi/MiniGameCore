@@ -66,7 +66,7 @@ public class MiniGameCommand implements CommandExecutor {
                     availableCommands.append(command).append(" | ");
                 }
             }
-            if (availableCommands.length() > 0) {
+            if (!availableCommands.isEmpty()) {
                 availableCommands.setLength(availableCommands.length() - 3);
             }
             availableCommands.append(">");
@@ -103,6 +103,7 @@ public class MiniGameCommand implements CommandExecutor {
                 ScoreBoardManager.setPlayerStatus(player, "WAITING");
                 Lobby lobby = LobbyManager.getLobbyByPlayer(player);
                 lobby.setLobbyState("WAITING");
+                player.sendMessage("§8[§6MiniGameCore§8]§a If you are ready use /mg ready to ready-up!");
                 break;
 
             case "join":
@@ -148,11 +149,11 @@ public class MiniGameCommand implements CommandExecutor {
                     PlayerHandler.PlayerSoftReset(player);
                     player.setGameMode(GameMode.SURVIVAL);
                     ScoreBoardManager.setPlayerStatus(player, "WAITING");
+                    player.sendMessage("§8[§6MiniGameCore§8]§a If you are ready use /mg ready to ready-up!");
                 }
                 break;
 
             case "confirm":
-
                 if (!player.hasPermission("mgcore.confirm")) {
                     player.sendMessage("§cYou have no permissions to use this Command!");
                     return true;

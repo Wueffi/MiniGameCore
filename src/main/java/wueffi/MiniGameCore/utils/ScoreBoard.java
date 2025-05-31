@@ -58,7 +58,7 @@ public class ScoreBoard {
             obj.getScore("§cNo players yet!").setScore(3);
         } else {
             for (int i = 0; i < players.size(); i++) {
-                if (!lobby.getReadyPlayers().contains(player)) {
+                if (!lobby.getReadyPlayers().contains(players.get(i))) {
                     obj.getScore("§f- " + players.get(i).getName()).setScore(players.size() - i + 2);
                 } else {
                     obj.getScore("§f- §a" + players.get(i).getName()).setScore(players.size() - i + 2);
