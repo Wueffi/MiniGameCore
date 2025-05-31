@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 import java.io.File;
+import java.util.Objects;
 
 import static org.bukkit.Bukkit.getLogger;
 import static wueffi.MiniGameCore.managers.LobbyManager.removeLobby;
@@ -31,7 +32,7 @@ public class LobbyHandler {
 
     private static void delete(File file) {
         if (file.isDirectory()) {
-            for (File child : file.listFiles()) {
+            for (File child : Objects.requireNonNull(file.listFiles())) {
                 delete(child);
             }
         }

@@ -22,6 +22,16 @@ public class PlayerHandler implements Listener {
                 LobbyHandler.LobbyReset(lobby);
             }
         }
+        PlayerSoftReset(player);
+        player.setGameMode(GameMode.CREATIVE);
+        World mainWorld = Bukkit.getWorlds().get(0);
+        if (mainWorld != null) {
+            Location spawn = mainWorld.getSpawnLocation();
+            player.teleport(spawn);
+        }
+    }
+
+    public static void PlayerSoftReset(Player player) {
         player.setHealth(20);
         player.setFoodLevel(20);
         player.setSaturation(5);
@@ -29,13 +39,6 @@ public class PlayerHandler implements Listener {
         player.setFireTicks(0);
         player.setExp(0);
         player.setLevel(69);
-        player.setGameMode(GameMode.CREATIVE);
-        World mainWorld = Bukkit.getWorlds().get(0);
-        if (mainWorld != null) {
-            Location spawn = mainWorld.getSpawnLocation();
-            player.teleport(spawn);
-        }
-
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
         player.setItemOnCursor(null);

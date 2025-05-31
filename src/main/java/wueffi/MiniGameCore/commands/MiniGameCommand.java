@@ -145,6 +145,7 @@ public class MiniGameCommand implements CommandExecutor {
                     gamer.sendMessage("§8[§6MiniGameCore§8]§a " + player.getName() + " joined! " +
                             lobby.getPlayers().size() + "/" + lobby.getMaxPlayers() + " players.");
                     player.teleport(lobby.getOwner());
+                    PlayerHandler.PlayerSoftReset(player);
                     player.setGameMode(GameMode.SURVIVAL);
                     ScoreBoardManager.setPlayerStatus(player, "WAITING");
                 }
