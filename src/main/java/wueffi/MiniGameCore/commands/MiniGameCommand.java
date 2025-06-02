@@ -1,5 +1,8 @@
 package wueffi.MiniGameCore.commands;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -194,7 +197,7 @@ public class MiniGameCommand implements CommandExecutor {
                     return true;
                 }
                 if (args.length >= 2) {
-                player.sendMessage("§cToo many Args! Usage: /mg unready");
+                player.sendMessage("§cToo many Args! Usage: /mg ready");
                     return true;
                 }
 
@@ -213,6 +216,10 @@ public class MiniGameCommand implements CommandExecutor {
                 if (!lobby.ready(player)) {
                     player.sendMessage("§8[§6MiniGameCore§8] §cCould not ready!");
                     return true;
+                } else {
+                    final TextComponent component = ChatComponentHandler.CreateBaseComponent();
+                    ChatComponentHandler.AddColorText(component, "You are now ready!", NamedTextColor.GREEN);
+                    player.sendMessage(component);
                 }
                 break;
 
@@ -241,6 +248,10 @@ public class MiniGameCommand implements CommandExecutor {
                 if (!lobby.unready(player)) {
                     player.sendMessage("§8[§6MiniGameCore§8] §cCould not unready!");
                     return true;
+                } else {
+                    final TextComponent component = ChatComponentHandler.CreateBaseComponent();
+                    ChatComponentHandler.AddColorText(component, "You are no longer ready!", NamedTextColor.RED);
+                    player.sendMessage(component);
                 }
                 break;
 
