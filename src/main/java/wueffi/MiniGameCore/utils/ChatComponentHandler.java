@@ -13,10 +13,10 @@ public class ChatComponentHandler {
     }
 
     public static TextComponent AddColorText(TextComponent component, String text, NamedTextColor color) {
-        return component.append(Component.text(text)).color(color);
+        return component.append(Component.text(text).color(color));
     }
 
     public static TextComponent AddColorText(TextComponent component, String text, TextColor color) {
-        return component.append(Component.text(text)).color(color);
+        return component.append(Component.text(text).color(color));
     }
 }
