@@ -18,8 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static org.bukkit.Bukkit.getLogger;
-
 public class MiniGameCommand implements CommandExecutor {
     private final MiniGameCore plugin;
 
@@ -50,6 +48,7 @@ public class MiniGameCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         LobbyManager lobbyManager = LobbyManager.getInstance();
+        Lobby lobby;
 
         if (!(sender instanceof Player player)) {
             sender.sendMessage(new ComponentFactory("Yo console User, only players can use this command!").toComponent());
@@ -98,7 +97,7 @@ public class MiniGameCommand implements CommandExecutor {
                 gameManager.hostGame(gameName, sender);
                 player.sendMessage(new ComponentFactory("Hosting game: " + args[1], NamedTextColor.GREEN).toComponent());
                 ScoreBoardManager.setPlayerStatus(player, "WAITING");
-                Lobby lobby = LobbyManager.getLobbyByPlayer(player);
+                lobby = LobbyManager.getLobbyByPlayer(player);
                 lobby.setLobbyState("WAITING");
                 player.sendMessage(new ComponentFactory("If you are ready use /mg ready to ready-up!", NamedTextColor.GREEN).toComponent());
                 break;
@@ -144,7 +143,7 @@ public class MiniGameCommand implements CommandExecutor {
                 }
                 World world = Bukkit.getWorld(lobby.getWorldFolder().getName());
                 if (world == null) {
-                    getLogger().warning("World was null! Teleporting to Owner instead. Lobby: " + lobby.getLobbyId() + ", State: " + lobby.getLobbyState());
+                    MiniGameCore.getPlugin().getLogger().warning("World was null! Teleporting to Owner instead. Lobby: " + lobby.getLobbyId() + ", State: " + lobby.getLobbyState());
                     player.teleport(lobby.getOwner().getLocation());
                 } else {
                     Location spawnLocation = world.getSpawnLocation();
@@ -366,7 +365,7 @@ public class MiniGameCommand implements CommandExecutor {
                             winrate = Math.round(winrate * 10) / 10.0f;
                         }
                         player.sendMessage(new ComponentFactory("- ", NamedTextColor.GRAY)
-                                .addColorText(game.toString(), NamedTextColor.GREEN)
+                                .addColorText(game, NamedTextColor.GREEN)
                                 .addColorText(": ", NamedTextColor.GRAY)
                                 .addColorText(Integer.toString(played), NamedTextColor.WHITE)
                                 .addColorText(" games played, ", NamedTextColor.GREEN)
@@ -446,11 +445,11 @@ public class MiniGameCommand implements CommandExecutor {
                 player.sendMessage(new ComponentFactory("Banning player: " + args[1], NamedTextColor.RED).toComponent());
                 plugin.banPlayer(Bukkit.getPlayer(args[1]).getUniqueId());
                 if (args.length == 2) {
-                    getLogger().info(player.getName() + " banned Player: " + args[1] + ".");
+                    MiniGameCore.getPlugin().getLogger().info(player.getName() + " banned Player: " + args[1] + ".");
                 } else {
                     String[] tempReason = Arrays.copyOfRange(args, 2, args.length);
                     String reason = String.join(" ", tempReason);
-                    getLogger().info(player.getName() + " banned Player: " + args[1] + "with reason: " + reason);
+                    MiniGameCore.getPlugin().getLogger().info(player.getName() + " banned Player: " + args[1] + "with reason: " + reason);
                 }
                 player.sendMessage(new ComponentFactory("Banned player: " + args[1], NamedTextColor.RED).toComponent());
                 break;
@@ -466,7 +465,7 @@ public class MiniGameCommand implements CommandExecutor {
                 }
                 player.sendMessage(new ComponentFactory("Unbanning player: " + args[1], NamedTextColor.RED).toComponent());
                 plugin.unbanPlayer(Bukkit.getPlayer(args[1]).getUniqueId());
-                getLogger().info(player.getName() + " unbanned Player: " + args[1] + ".");
+                MiniGameCore.getPlugin().getLogger().info(player.getName() + " unbanned Player: " + args[1] + ".");
                 player.sendMessage(new ComponentFactory("Unbanned player: " + args[1], NamedTextColor.RED).toComponent());
                 break;
 

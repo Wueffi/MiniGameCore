@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.bukkit.Bukkit.getLogger;
 import static wueffi.MiniGameCore.managers.GameManager.alivePlayers;
 
 public class ScoreBoardManager implements Listener {
@@ -50,7 +49,6 @@ public class ScoreBoardManager implements Listener {
 
     public static void updatePlayerBoard(Player player) {
         String status = playerGameStatus.getOrDefault(player, "NONE");
-        // getLogger().info(status);
         switch (status) {
             case "WAITING":
                 Lobby lobby = LobbyManager.getLobbyByPlayer(player);

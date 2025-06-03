@@ -6,7 +6,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
 public class ComponentFactory {
-    TextComponent.Builder component;
+    private final TextComponent.Builder component;
 
     public ComponentFactory() {
         component = Component.text();
