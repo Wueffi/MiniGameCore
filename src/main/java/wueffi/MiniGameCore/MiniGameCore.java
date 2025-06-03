@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.UUID;
 
 public class MiniGameCore extends JavaPlugin {
-    private final MiniGameCore plugin = this;
+    private static MiniGameCore plugin;
     private List<String> availableGames;
     private List<UUID> bannedPlayers;
 
     @Override
     public void onEnable() {
-        getLogger().info("MinigameCore enabled!");
+        plugin.getLogger().info("MinigameCore enabled!");
         saveDefaultConfig();
 
         List<String> availableGames = getConfig().getStringList("available-games");
@@ -35,14 +35,14 @@ public class MiniGameCore extends JavaPlugin {
         }
         this.availableGames = availableGames;
         this.bannedPlayers = bannedPlayers;
-        getLogger().info("Config loaded!");
+        plugin.getLogger().info("Config loaded!");
 
         Stats.setup();
-        getLogger().info("Stats loaded!");
+        plugin.getLogger().info("Stats loaded!");
 
         getCommand("mg").setExecutor(new MiniGameCommand(this));
         getCommand("mg").setTabCompleter(new MiniGameTabCompleter(this));
-        getLogger().info("Commands registered!");
+        plugin.getLogger().info("Commands registered!");
 
         ScoreBoardManager.startAnimationLoop();
 
@@ -54,17 +54,17 @@ public class MiniGameCore extends JavaPlugin {
     public void onDisable() {
         for (Lobby lobby : LobbyManager.getInstance().getOpenLobbies()) {
             String lobbyid = lobby.getLobbyId();
-            getLogger().info("Lobby: " + lobbyid);
+            plugin.getLogger().info("Lobby: " + lobbyid);
             for (Player player : LobbyManager.getInstance().getLobby(lobbyid).getPlayers()) {
-                getLogger().info("Player: " + lobbyid);
+                plugin.getLogger().info("Player: " + lobbyid);
                 PlayerHandler.PlayerReset(player);
             }
-            getLogger().info("Lobby disabling: " + lobbyid);
+            plugin.getLogger().info("Lobby disabling: " + lobbyid);
             LobbyHandler.LobbyReset(LobbyManager.getInstance().getLobby(lobbyid));
-            getLogger().info("Shut down Lobby: " + lobbyid);
+            plugin.getLogger().info("Shut down Lobby: " + lobbyid);
         }
         GameManager.frozenPlayers.clear();
-        getLogger().info("MinigameCore disabled!");
+        plugin.getLogger().info("MinigameCore disabled!");
     }
 
     public List<String> getAvailableGames() {
@@ -94,7 +94,10 @@ public class MiniGameCore extends JavaPlugin {
         writeBannedPlayers();
     }
 
-    public MiniGameCore getPlugin() {
+    public static MiniGameCore getPlugin() {
+        if (plugin == null) {
+            plugin = JavaPlugin.getPlugin(MiniGameCore.class);
+        }
         return plugin;
     }
 }

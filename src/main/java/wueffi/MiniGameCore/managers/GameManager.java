@@ -1,5 +1,8 @@
 package wueffi.MiniGameCore.managers;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -21,9 +24,8 @@ import wueffi.MiniGameCore.utils.*;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.time.Duration;
 import java.util.*;
-
-import static org.bukkit.Bukkit.getLogger;
 
 public class GameManager implements Listener {
     static final Map<Lobby, List<Player>> alivePlayers = new HashMap<>();
@@ -45,8 +47,10 @@ public class GameManager implements Listener {
     }
 
     public static void winGame(Lobby lobby, Player winner) {
+        Title wonTitle = Title.title(Component.text(winner.getName(), NamedTextColor.GOLD),
+                Component.text("won the Game!", NamedTextColor.RED));
         for (Player player : lobby.getPlayers()) {
-            player.sendTitle("§6" + winner.getName(), "won the Game!", 10, 70, 20);
+            player.showTitle(wonTitle);
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
             Stats.win(lobby.getGameName(), winner);
             if (!player.equals(winner)) {
@@ -87,7 +91,8 @@ public class GameManager implements Listener {
 
                 for (Player teamPlayer : teamPlayers) {
                     if (teamSpawns.isEmpty()) {
-                        getLogger().warning("Not enough SpawnPoints for Team " + (teamIndex + 1) + " in Lobby " + lobby.getLobbyId());
+                        MiniGameCore.getPlugin().getLogger().warning("Not enough SpawnPoints for Team " + (teamIndex + 1) +
+                                " in Lobby " + lobby.getLobbyId());
                         continue;
                     }
 
@@ -121,15 +126,25 @@ public class GameManager implements Listener {
             @Override
             public void run() {
                 if (timeLeft > 0) {
+                    Title countdownTitle = Title.title(
+                            Component.text("Game starting in " + timeLeft, NamedTextColor.GREEN),
+                            Component.text("Get ready!", NamedTextColor.RED),
+                            Title.Times.times(Duration.ofMillis(10), Duration.ofMillis(70), Duration.ofMillis(20))
+                    );
                     for (Player player : lobby.getPlayers()) {
-                        player.sendTitle("§aGame starting in " + timeLeft, "", 10, 70, 20);
+                        player.showTitle(countdownTitle);
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1.0f, 2.0f);
                     }
                     timeLeft--;
                 } else {
                     lobby.setLobbyState("GAME");
+                    Title startTitle = Title.title(
+                            Component.text("Game Started!", NamedTextColor.GREEN),
+                            Component.text("Teaming / Cheating is bannable!", NamedTextColor.RED),
+                            Title.Times.times(Duration.ofMillis(10), Duration.ofMillis(70), Duration.ofMillis(20))
+                    );
                     for (Player player : lobby.getPlayers()) {
-                        player.sendTitle("§aGame Started!", "§cTeaming / Cheating is bannable!");
+                        player.showTitle(startTitle);
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1.0f, 5.0f);
                         ScoreBoardManager.setPlayerStatus(player, "GAME");
                         player.getInventory().clear();
@@ -323,10 +338,23 @@ public class GameManager implements Listener {
                         if (secondsLeft <= 0) {
                             player.teleport(respawnLocation);
                             player.setGameMode(GameMode.SURVIVAL);
-                            player.sendTitle("§aRespawned!", "", 10, 20, 10);
+                            player.showTitle(
+                                    Title.title(Component.text("Respawned!", NamedTextColor.GREEN),
+                                            Component.empty(),
+                                            Title.Times.times(
+                                                    Duration.ofMillis(10), Duration.ofMillis(70), Duration.ofMillis(20))
+                                    )
+                            );
                             this.cancel();
                         } else {
-                            player.sendTitle("§cRespawning in", "§c" + secondsLeft + " s", 0, 20, 0);
+                            player.showTitle(
+                                    Title.title(
+                                            Component.text("Respawning in!", NamedTextColor.RED),
+                                            Component.text(secondsLeft + " s", NamedTextColor.RED),
+                                            Title.Times.times(
+                                                    Duration.ofMillis(0), Duration.ofMillis(20), Duration.ofMillis(0))
+                                    )
+                            );
                             secondsLeft--;
                         }
                     }

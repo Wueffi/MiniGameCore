@@ -3,6 +3,7 @@ package wueffi.MiniGameCore.managers;
 import org.bukkit.entity.Player;
 import wueffi.MiniGameCore.utils.Lobby;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +45,7 @@ public class LobbyManager {
         return lobby;
     }
 
+    @Nullable
     public Lobby getLobby(String lobbyId) {
         return lobbies.get(lobbyId);
     }

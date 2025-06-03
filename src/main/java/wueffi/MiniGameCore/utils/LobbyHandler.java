@@ -2,18 +2,18 @@ package wueffi.MiniGameCore.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import wueffi.MiniGameCore.MiniGameCore;
 
 import java.io.File;
 import java.util.Objects;
 
-import static org.bukkit.Bukkit.getLogger;
 import static wueffi.MiniGameCore.managers.LobbyManager.removeLobby;
 
 public class LobbyHandler {
 
     public static void LobbyReset(Lobby lobby) {
         if (lobby == null) {
-            getLogger().warning("Lobby was null!");
+            MiniGameCore.getPlugin().getLogger().warning("Lobby was null!");
             return;
         }
         deleteWorldFolder(lobby);
@@ -27,7 +27,7 @@ public class LobbyHandler {
             Bukkit.unloadWorld(world, false);
         }
         delete(lobby.getWorldFolder());
-        getLogger().info("Deleted world: " + lobby.getWorldFolder().getName());
+        MiniGameCore.getPlugin().getLogger().info("Deleted world: " + lobby.getWorldFolder().getName());
     }
 
     private static void delete(File file) {
