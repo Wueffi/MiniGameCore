@@ -1,7 +1,5 @@
 package wueffi.MiniGameCore.commands;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.command.Command;
@@ -54,66 +52,64 @@ public class MiniGameCommand implements CommandExecutor {
         LobbyManager lobbyManager = LobbyManager.getInstance();
 
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("Yo console User, only players can use this command!");
+            sender.sendMessage(new ComponentFactory("Yo console User, only players can use this command!").toComponent());
             return true;
         }
         HashMap<String, String> commands_permissions = getCommandsPermissions();
 
         if (args.length < 1) {
-            StringBuilder availableCommands = new StringBuilder("§fUsage: §6/mg <");
+            ComponentFactory availableCommands = new ComponentFactory("Usage: ");
+            availableCommands.addColorText("/mg <", NamedTextColor.GOLD);
 
-            for (String command: commands_permissions.keySet()) {
+            for (String command : commands_permissions.keySet()) {
                 if (player.hasPermission(commands_permissions.get(command))) {
-                    availableCommands.append(command).append(" | ");
+                    availableCommands.addText(command).addText(" | ");
                 }
             }
-            if (!availableCommands.isEmpty()) {
-                availableCommands.setLength(availableCommands.length() - 3);
-            }
-            availableCommands.append(">");
-            player.sendMessage(availableCommands.toString());
+            availableCommands.addText(">");
+            player.sendMessage(availableCommands.toComponent());
             return true;
         }
 
         switch (args[0].toLowerCase()) {
             case "host":
                 if (plugin.getBannedPlayers().contains(player.getUniqueId())) {
-                    player.sendMessage("§cYou were banned by an Administrator.");
+                    player.sendMessage(new ComponentFactory("You were banned by an Administrator.", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (args.length < 2) {
-                    player.sendMessage("§cMissing Args! Usage: /mg host <game>");
+                    player.sendMessage(new ComponentFactory("Missing Args! Usage: /mg host <game>", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (!player.hasPermission("mgcore.host")) {
-                    player.sendMessage("§cYou have no permissions to use this Command!");
+                    player.sendMessage(new ComponentFactory("You have no permissions to use this Command!", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (LobbyManager.getLobbyByPlayer(player) != null) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cYou are already in another lobby!");
+                    player.sendMessage(new ComponentFactory("You are already in another lobby!", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 String gameName = args[1];
                 if (!plugin.getAvailableGames().contains(gameName)) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cGame " + gameName + " not available!");
+                    player.sendMessage(new ComponentFactory("Game " + gameName + " not available!", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 GameManager gameManager = new GameManager(plugin);
                 gameManager.hostGame(gameName, sender);
-                player.sendMessage("§8[§6MiniGameCore§8]§a Hosting game: " + args[1]);
+                player.sendMessage(new ComponentFactory("Hosting game: " + args[1], NamedTextColor.GREEN).toComponent());
                 ScoreBoardManager.setPlayerStatus(player, "WAITING");
                 Lobby lobby = LobbyManager.getLobbyByPlayer(player);
                 lobby.setLobbyState("WAITING");
-                player.sendMessage("§8[§6MiniGameCore§8]§a If you are ready use /mg ready to ready-up!");
+                player.sendMessage(new ComponentFactory("If you are ready use /mg ready to ready-up!", NamedTextColor.GREEN).toComponent());
                 break;
 
             case "join":
                 if (plugin.getBannedPlayers().contains(player.getUniqueId())) {
-                    player.sendMessage("§cYou were banned by an Administrator.");
+                    player.sendMessage(new ComponentFactory("You were banned by an Administrator.", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (args.length < 2) {
-                    player.sendMessage("§cMissing Args! Usage: /mg join <game>");
+                    player.sendMessage(new ComponentFactory("Missing Args! Usage: /mg join <game>", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
@@ -121,30 +117,30 @@ public class MiniGameCommand implements CommandExecutor {
                 lobby = lobbyManager.getLobby(lobbyName);
 
                 if (LobbyManager.getLobbyByPlayer(player) != null) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cYou are already in another lobby!");
+                    player.sendMessage(new ComponentFactory("You are already in another lobby!", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
                 if (!Objects.equals(lobby.getLobbyState(), "WAITING")) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cThe game already started!");
+                    player.sendMessage(new ComponentFactory("The game already started!", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (lobby == null) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cLobby not found!");
+                    player.sendMessage(new ComponentFactory("Lobby not found!", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
                 if (lobby.isFull()) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cLobby is already full!");
+                    player.sendMessage(new ComponentFactory("Lobby is already full!", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
                 if (!lobby.addPlayer(player)) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cCould not join the lobby.");
+                    player.sendMessage(new ComponentFactory("Could not join the lobby.", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 for (Player gamer : lobby.getPlayers()) {
-                    gamer.sendMessage("§8[§6MiniGameCore§8]§a " + player.getName() + " joined! " + lobby.getPlayers().size() + "/" + lobby.getMaxPlayers() + " players.");
+                    gamer.sendMessage(new ComponentFactory(player.getName() + " joined! " + lobby.getPlayers().size() + "/" + lobby.getMaxPlayers() + " players.", NamedTextColor.GREEN).toComponent());
                 }
                 World world = Bukkit.getWorld(lobby.getWorldFolder().getName());
                 if (world == null) {
@@ -157,174 +153,174 @@ public class MiniGameCommand implements CommandExecutor {
                 PlayerHandler.PlayerSoftReset(player);
                 player.setGameMode(GameMode.SURVIVAL);
                 ScoreBoardManager.setPlayerStatus(player, "WAITING");
-                player.sendMessage("§8[§6MiniGameCore§8]§a If you are ready use /mg ready to ready-up!");
+                player.sendMessage(new ComponentFactory("If you are ready use /mg ready to ready-up!", NamedTextColor.GREEN).toComponent());
                 break;
 
             case "confirm":
                 if (!player.hasPermission("mgcore.confirm")) {
-                    player.sendMessage("§cYou have no permissions to use this Command!");
+                    player.sendMessage(new ComponentFactory("You have no permissions to use this Command!", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (args.length >= 2) {
-                    player.sendMessage("§cToo many Args! Usage: /mg confirm");
+                    player.sendMessage(new ComponentFactory("Too many Args! Usage: /mg confirm", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (!confirmations.containsKey(player)) {
-                    player.sendMessage("§cYou have nothing to confirm!");
+                    player.sendMessage(new ComponentFactory("You have nothing to confirm!", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
                 Lobby confirmLobby = confirmations.remove(player);
 
                 if (confirmLobby == null || !"WAITING".equals(confirmLobby.getLobbyState())) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cThe Lobby already started or is no longer valid!");
+                    player.sendMessage(new ComponentFactory("The Lobby already started or is no longer valid!", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (player != confirmLobby.getOwner()) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cYou are not the owner of this lobby! How did you manage to do this?");
+                    player.sendMessage(new ComponentFactory("You are not the owner of this lobby! How did you manage to do this?", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
                 for (Player p : confirmLobby.getPlayers()) {
-                    p.sendMessage("§8[§6MiniGameCore§8]" + confirmLobby.getOwner().getName() + " force-started the Game!");
+                    p.sendMessage(new ComponentFactory(confirmLobby.getOwner().getName() + " force-started the Game!"
+                            , NamedTextColor.GOLD).toComponent());
                 }
-                player.sendMessage("§8[§6MiniGameCore§8] §aStarting game: " + confirmLobby.getLobbyId());
+                player.sendMessage(new ComponentFactory("Starting game: " + confirmLobby.getLobbyId(),
+                        NamedTextColor.GREEN).toComponent());
                 GameManager.startGame(confirmLobby);
 
             case "ready":
                 if (!player.hasPermission("mgcore.ready")) {
-                    player.sendMessage("§cYou have no permissions to use this Command!");
+                    player.sendMessage(new ComponentFactory("You have no permissions to use this Command!", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (args.length >= 2) {
-                player.sendMessage("§cToo many Args! Usage: /mg ready");
+                    player.sendMessage(new ComponentFactory("Too many Args! Usage: /mg ready", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
                 if (LobbyManager.getLobbyByPlayer(player) == null) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cYou are in no lobby!");
+                    player.sendMessage(new ComponentFactory("You are not in a lobby!", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
                 lobby = LobbyManager.getLobbyByPlayer(player);
 
                 if (!Objects.equals(lobby.getLobbyState(), "WAITING")) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cThe game already started!");
+                    player.sendMessage(new ComponentFactory("The game already started!", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
                 if (!lobby.ready(player)) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cCould not ready!");
+                    player.sendMessage(new ComponentFactory("Could not ready!", NamedTextColor.RED).toComponent());
                     return true;
                 } else {
-                    final TextComponent component = ChatComponentHandler.CreateBaseComponent();
-                    ChatComponentHandler.AddColorText(component, "You are now ready!", NamedTextColor.GREEN);
-                    player.sendMessage(component);
+                    player.sendMessage(new ComponentFactory("You are now ready!", NamedTextColor.GREEN).toComponent());
+                    return true;
                 }
-                break;
 
             case "unready":
                 if (!player.hasPermission("mgcore.unready")) {
-                    player.sendMessage("§cYou have no permissions to use this Command!");
+                    player.sendMessage(new ComponentFactory("You have no permissions to use this Command!", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (args.length >= 2) {
-                    player.sendMessage("§cToo many Args! Usage: /mg unready");
+                    player.sendMessage(new ComponentFactory("Too many Args! Usage: /mg unready", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
                 if (LobbyManager.getLobbyByPlayer(player) == null) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cYou are in no lobby!");
+                    player.sendMessage(new ComponentFactory("You are in no lobby!", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
                 lobby = LobbyManager.getLobbyByPlayer(player);
 
                 if (!Objects.equals(lobby.getLobbyState(), "WAITING")) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cThe game already started!");
+                    player.sendMessage(new ComponentFactory("The game already started!", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
                 if (!lobby.unready(player)) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cCould not unready!");
+                    player.sendMessage(new ComponentFactory("Could not unready!", NamedTextColor.RED).toComponent());
                     return true;
                 } else {
-                    final TextComponent component = ChatComponentHandler.CreateBaseComponent();
-                    ChatComponentHandler.AddColorText(component, "You are no longer ready!", NamedTextColor.RED);
-                    player.sendMessage(component);
+                    player.sendMessage(new ComponentFactory("You are no longer ready!", NamedTextColor.RED).toComponent());
+                    return true;
                 }
-                break;
 
             case "leave":
                 if (args.length >= 2) {
-                    player.sendMessage("§cToo many Args! Usage: /mg leave");
+                    player.sendMessage(new ComponentFactory("Too many Args! Usage: /mg leave", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
                 lobby = LobbyManager.getLobbyByPlayer(player);
 
                 if (lobby == null) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cYou are not in any lobby!");
+                    player.sendMessage(new ComponentFactory("You are not in any lobby!", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
                 if (lobby.removePlayer(player)) {
                     PlayerHandler.PlayerReset(player);
                     for (Player gamer : lobby.getPlayers()) {
-                        gamer.sendMessage("§8[§6MiniGameCore§8]§a " + player.getName() + " left the Lobby! " + lobby.getPlayers().size() + "/" + lobby.getMaxPlayers() + " players.");
+                        gamer.sendMessage(new ComponentFactory(player.getName() + " left the Lobby! " + lobby.getPlayers().size() + "/" + lobby.getMaxPlayers() + " players.", NamedTextColor.GREEN).toComponent());
                     }
 
                     if (lobby.isOwner(player) || lobby.getPlayers().isEmpty()) {
-                        player.sendMessage("§8[§6MiniGameCore§8] §cYou were the owner of this lobby. The game will now be stopped.");
+                        player.sendMessage(new ComponentFactory("You were the owner of this lobby. The game will now " +
+                                "be stopped.", NamedTextColor.RED).toComponent());
                         for (Player gamer : lobby.getPlayers()) {
-                            gamer.sendMessage("§8[§6MiniGameCore§8]§c Lobby Owner " + player.getName() + " left the Lobby! Resetting...");
+                            gamer.sendMessage(new ComponentFactory("Lobby Owner " + player.getName() + " left the " +
+                                    "Lobby! Resetting...", NamedTextColor.RED).toComponent());
                             PlayerHandler.PlayerReset(gamer);
                         }
                         LobbyHandler.LobbyReset(lobby);
                     }
                     ScoreBoardManager.setPlayerStatus(player, "NONE");
                 } else {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cFailed to leave the game. Please try again.");
+                    player.sendMessage(new ComponentFactory("Failed to leave the game. Please try again.", NamedTextColor.RED).toComponent());
                 }
                 break;
 
 
             case "start":
                 if (!player.hasPermission("mgcore.start")) {
-                    player.sendMessage("§cYou have no permissions to use this command!");
+                    player.sendMessage(new ComponentFactory("You have no permissions to use this command!", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
                 lobby = LobbyManager.getLobbyByPlayer(player);
                 if (lobby == null) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cYou are not in a lobby!");
+                    player.sendMessage(new ComponentFactory("You are not in a lobby!", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
                 if (!lobby.isOwner(player)) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cOnly the lobby owner can start the game!");
+                    player.sendMessage(new ComponentFactory("Only the lobby owner can start the game!", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (!(lobby.getReadyPlayers().size() == lobby.getPlayers().size())) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cNot everyone is ready! To continue, run /mg confirm.");
+                    player.sendMessage(new ComponentFactory("Not everyone is ready! To continue, run /mg confirm.", NamedTextColor.RED).toComponent());
                     confirmations.put(player, lobby);
                     return true;
                 }
                 GameManager.startGame(lobby);
-                player.sendMessage("§8[§6MiniGameCore§8] §aStarting game: " + lobby.getLobbyId());
+                player.sendMessage(new ComponentFactory("Starting game: " + lobby.getLobbyId(), NamedTextColor.GREEN).toComponent());
                 break;
 
             case "spectate":
                 if (args.length < 2) {
-                    player.sendMessage("§cMissing Args! Usage: /mg spectate <game|player>");
+                    player.sendMessage(new ComponentFactory("Missing Args! Usage: /mg spectate <game|player>", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (!player.hasPermission("mgcore.spectate")) {
-                    player.sendMessage("§cYou have no permissions to use this Command!");
+                    player.sendMessage(new ComponentFactory("You have no permissions to use this Command!", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (LobbyManager.getLobbyByPlayer(player) != null) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cYou are already in a game! Type /mg leave to leave!");
+                    player.sendMessage(new ComponentFactory("You are already in a game! Type /mg leave to leave!", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
@@ -332,30 +328,31 @@ public class MiniGameCommand implements CommandExecutor {
 
                 Player targetPlayer = Bukkit.getPlayer(target);
                 if (targetPlayer != null && targetPlayer.isOnline()) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §aYou are now spectating " + targetPlayer.getName() + ".");
+                    player.sendMessage(new ComponentFactory("You are now spectating " + targetPlayer.getName() + ".",
+                            NamedTextColor.GREEN).toComponent());
                     player.teleport(targetPlayer);
                     player.setGameMode(GameMode.SPECTATOR);
                 } else {
                     lobby = LobbyManager.getInstance().getLobby(target);
                     if (lobby != null) {
-                        player.sendMessage("§8[§6MiniGameCore§8] §aYou are now spectating the lobby of " + lobby.getOwner().getName() + ".");
+                        player.sendMessage(new ComponentFactory("You are now spectating the lobby of " + lobby.getOwner().getName() + ".", NamedTextColor.GREEN).toComponent());
                         player.teleport(lobby.getOwner());
                         player.setGameMode(GameMode.SPECTATOR);
                     } else {
-                        player.sendMessage("§8[§6MiniGameCore§8]§cNo player or lobby found with that name.");
+                        player.sendMessage(new ComponentFactory("No player or lobby found with that name.", NamedTextColor.RED).toComponent());
                     }
                 }
                 break;
 
             case "stats":
                 if (args.length == 1) {
-                    player.sendMessage("§cUsage: /mg stats <Player>");
+                    player.sendMessage(new ComponentFactory("Usage: /mg stats <Player>", NamedTextColor.RED).toComponent());
                     return true;
                 }
 
                 OfflinePlayer targetplayer = Bukkit.getOfflinePlayer(args[1]);
 
-                player.sendMessage("§8[§6MiniGameCore§8] §6Stats for " + targetplayer.getName() + ":");
+                player.sendMessage(new ComponentFactory("Stats for " + targetplayer.getName() + ":", NamedTextColor.GOLD).toComponent());
 
                 for (String game : plugin.getAvailableGames()) {
                     int played = Stats.getPlayed(game, targetplayer);
@@ -368,74 +365,85 @@ public class MiniGameCommand implements CommandExecutor {
                             winrate = ((float) wins / played) * 100;
                             winrate = Math.round(winrate * 10) / 10.0f;
                         }
-                        player.sendMessage("§7- §a" + game + "§7: §f" + played + " §agames played, §6" + wins + " §agames won, §c" + losses + " §alost. Win rate: §3" + winrate + "§a%");
+                        player.sendMessage(new ComponentFactory("- ", NamedTextColor.GRAY)
+                                .addColorText(game.toString(), NamedTextColor.GREEN)
+                                .addColorText(": ", NamedTextColor.GRAY)
+                                .addColorText(Integer.toString(played), NamedTextColor.WHITE)
+                                .addColorText(" games played, ", NamedTextColor.GREEN)
+                                .addColorText(Integer.toString(wins), NamedTextColor.GOLD)
+                                .addColorText(" games won, ", NamedTextColor.GREEN)
+                                .addColorText(Integer.toString(losses), NamedTextColor.RED)
+                                .addColorText(" lost. Win rate: ", NamedTextColor.GREEN)
+                                .addColorText(Float.toString(winrate), NamedTextColor.DARK_AQUA)
+                                .addColorText("%", NamedTextColor.GREEN)
+                                .toComponent());
                     }
                 }
                 break;
 
             case "reload":
                 if (!player.hasPermission("mgcore.admin")) {
-                    player.sendMessage("§cYou have no permissions to use this Command!");
+                    player.sendMessage(new ComponentFactory("You have no permissions to use this Command!", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 plugin.reloadConfig();
                 Stats.setup();
-                player.sendMessage("§8[§6MiniGameCore§8] §aPlugin reloaded!");
+                player.sendMessage(new ComponentFactory("Plugin reloaded!", NamedTextColor.GREEN).toComponent());
                 break;
 
             case "stopall":
                 if (!player.hasPermission("mgcore.admin")) {
-                    player.sendMessage("§cYou have no permissions to use this Command!");
+                    player.sendMessage(new ComponentFactory("", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (lobbyManager.getOpenLobbies() == null) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cNo active Lobbies.");
+                    player.sendMessage(new ComponentFactory("No active Lobbies.", NamedTextColor.RED).toComponent());
                     return true;
                 }
-                player.sendMessage("§8[§6MiniGameCore§8] §cStopping all games!");
+                player.sendMessage(new ComponentFactory("Stopping all games!", NamedTextColor.RED).toComponent());
                 for (Lobby lobby1 : LobbyManager.getInstance().getOpenLobbies()) {
                     for (Player gamer : lobby1.getPlayers()) {
-                        gamer.sendMessage("§8[§6MiniGameCore§8]§c Administrator stopped the game! Resetting...");
+                        gamer.sendMessage(new ComponentFactory("Administrator stopped the game! Resetting...", NamedTextColor.RED).toComponent());
                         PlayerHandler.PlayerReset(gamer);
                         LobbyHandler.LobbyReset(lobby1);
                     }
                 }
-                player.sendMessage("§8[§6MiniGameCore§8] §cStopped all games.");
+                player.sendMessage(new ComponentFactory("Stopped all games.", NamedTextColor.RED).toComponent());
                 break;
 
             case "stop":
                 if (!player.hasPermission("mgcore.admin")) {
-                    player.sendMessage("§cNo permission!");
+                    player.sendMessage(new ComponentFactory("You have no permissions to use this Command!", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (args.length < 2) {
-                    player.sendMessage("§cMissing Args! Usage: /mg stop <game>");
+                    player.sendMessage(new ComponentFactory("Missing Args! Usage: /mg stop <game>", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (lobbyManager.getLobby(args[1]) == null) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cNo active Lobbies.");
+                    player.sendMessage(new ComponentFactory("No active Lobbies.", NamedTextColor.RED).toComponent());
                     return true;
                 }
-                player.sendMessage("§8[§6MiniGameCore§8] §cStopping game: " + args[1]);
+                player.sendMessage(new ComponentFactory("Stopping game: " + args[1], NamedTextColor.RED).toComponent());
                 lobby = lobbyManager.getLobby(args[1]);
                 for (Player gamer : lobby.getPlayers()) {
-                    gamer.sendMessage("§8[§6MiniGameCore§8]§c Administrator stopped the game! Resetting...");
+                    gamer.sendMessage(new ComponentFactory("Administrator stopped the game! Resetting...", NamedTextColor.RED).toComponent());
                     PlayerHandler.PlayerReset(gamer);
                     LobbyHandler.LobbyReset(lobby);
                 }
-                player.sendMessage("§8[§6MiniGameCore§8] §cStopped game: " + args[1]);
+                player.sendMessage(new ComponentFactory("Stopped game: " + args[1], NamedTextColor.RED).toComponent());
                 break;
 
             case "ban":
                 if (!player.hasPermission("mgcore.admin")) {
-                    player.sendMessage("§cYou don't have permissions to use this Command!");
+                    player.sendMessage(new ComponentFactory("You have no permissions to use this Command!", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (args.length < 2) {
-                    player.sendMessage("§cMissing Args! Usage: /mg ban <player>");
+                    player.sendMessage(new ComponentFactory("Missing Args! Usage: /mg ban <player>", NamedTextColor.RED).toComponent());
                     return true;
                 }
-                player.sendMessage("§8[§6MiniGameCore§8] §cBanning player: " + args[1]);
+                player.sendMessage(new ComponentFactory("Banning player: " + args[1], NamedTextColor.RED).toComponent());
                 plugin.banPlayer(Bukkit.getPlayer(args[1]).getUniqueId());
                 if (args.length == 2) {
                     getLogger().info(player.getName() + " banned Player: " + args[1] + ".");
@@ -444,26 +452,26 @@ public class MiniGameCommand implements CommandExecutor {
                     String reason = String.join(" ", tempReason);
                     getLogger().info(player.getName() + " banned Player: " + args[1] + "with reason: " + reason);
                 }
-                player.sendMessage("§8[§6MiniGameCore§8] §cBanned player: " + args[1]);
+                player.sendMessage(new ComponentFactory("Banned player: " + args[1], NamedTextColor.RED).toComponent());
                 break;
 
             case "unban":
                 if (!player.hasPermission("mgcore.admin")) {
-                    player.sendMessage("§cYou don't have permissions to use this Command!");
+                    player.sendMessage(new ComponentFactory("You have no permissions to use this Command!", NamedTextColor.RED).toComponent());
                     return true;
                 }
                 if (args.length < 2) {
-                    player.sendMessage("§cMissing Args! Usage: /mg unban <player>");
+                    player.sendMessage(new ComponentFactory("Missing Args! Usage: /mg unban <player>", NamedTextColor.RED).toComponent());
                     return true;
                 }
-                player.sendMessage("§8[§6MiniGameCore§8] §cUnbanning player: " + args[1]);
+                player.sendMessage(new ComponentFactory("Unbanning player: " + args[1], NamedTextColor.RED).toComponent());
                 plugin.unbanPlayer(Bukkit.getPlayer(args[1]).getUniqueId());
                 getLogger().info(player.getName() + " unbanned Player: " + args[1] + ".");
-                player.sendMessage("§8[§6MiniGameCore§8] §cUnbanned player: " + args[1]);
+                player.sendMessage(new ComponentFactory("Unbanned player: " + args[1], NamedTextColor.RED).toComponent());
                 break;
 
             default:
-                player.sendMessage("§8[§6MiniGameCore§8] §cUnknown subcommand!");
+                player.sendMessage(new ComponentFactory("Unknown subcommand!", NamedTextColor.RED).toComponent());
                 break;
         }
 
