@@ -288,16 +288,19 @@ public class GameManager implements Listener {
 
         if (lobby != null) {
             event.setCancelled(true);
+
+            final World lobbyWorld = Bukkit.getWorld(lobby.getWorldFolder().getName());
+            if (lobbyWorld != null) {
+                player.teleport(lobbyWorld.getSpawnLocation());
+            } else {
+                getLogger().warning("Lobby world was null! " + player + "," + lobby);
+                player.teleport(alivePlayers.get(lobby).getFirst());
+            }
             player.setGameMode(GameMode.SPECTATOR);
 
             GameConfig config = loadGameConfigFromWorld(lobby.getWorldFolder());
 
-            final World lobbyWorld = Bukkit.getWorld(lobby.getWorldFolder().getName());
-            try {
-                player.teleport(lobbyWorld.getSpawnLocation());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+
             if (!config.getRespawnMode()) {
                 player.sendMessage("§8[§6MiniGameCore§8]§c You died! §aYou are now spectating.");
                 List<Player> alive = alivePlayers.get(lobby);

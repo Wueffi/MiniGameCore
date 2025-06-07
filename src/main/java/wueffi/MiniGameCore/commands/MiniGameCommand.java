@@ -36,6 +36,7 @@ public class MiniGameCommand implements CommandExecutor {
         commands_permissions.put("leave", "mgcore.leave");
         commands_permissions.put("start", "mgcore.start");
         commands_permissions.put("spectate", "mgcore.spectate");
+        commands_permissions.put("unspectate", "mgcore.unspectate");
         commands_permissions.put("reload", "mgcore.admin");
         commands_permissions.put("stopall", "mgcore.admin");
         commands_permissions.put("stop", "mgcore.admin");
@@ -117,6 +118,11 @@ public class MiniGameCommand implements CommandExecutor {
                 String lobbyName = args[1];
                 lobby = lobbyManager.getLobby(lobbyName);
 
+                if (lobby == null) {
+                    player.sendMessage("§8[§6MiniGameCore§8] §cLobby not found!");
+                    return true;
+                }
+
                 if (LobbyManager.getLobbyByPlayer(player) != null) {
                     player.sendMessage("§8[§6MiniGameCore§8] §cYou are already in another lobby!");
                     return true;
@@ -124,10 +130,6 @@ public class MiniGameCommand implements CommandExecutor {
 
                 if (!Objects.equals(lobby.getLobbyState(), "WAITING")) {
                     player.sendMessage("§8[§6MiniGameCore§8] §cThe game already started!");
-                    return true;
-                }
-                if (lobby == null) {
-                    player.sendMessage("§8[§6MiniGameCore§8] §cLobby not found!");
                     return true;
                 }
 
@@ -336,6 +338,27 @@ public class MiniGameCommand implements CommandExecutor {
                 }
                 break;
 
+            case "unspectate":
+                if (args.length > 1) {
+                    player.sendMessage("§cToo many Args! Usage: /mg unspectate");
+                    return true;
+                }
+                if (!player.hasPermission("mgcore.spectate")) {
+                    player.sendMessage("§cYou have no permissions to use this Command!");
+                    return true;
+                }
+                if (LobbyManager.getLobbyByPlayer(player) != null) {
+                    player.sendMessage("§8[§6MiniGameCore§8] §cYou are already in a game! Type /mg leave to leave!");
+                    return true;
+                }
+
+                player.sendMessage("§8[§6MiniGameCore§8] §aYou are not spectating the game anymore.");
+                world = Bukkit.getWorld("world");
+                assert world != null;
+                player.teleport(world.getSpawnLocation());
+                player.setGameMode(GameMode.CREATIVE);
+                break;
+
             case "stats":
                 if (args.length == 1) {
                     player.sendMessage("§cUsage: /mg stats <Player>");
@@ -343,6 +366,11 @@ public class MiniGameCommand implements CommandExecutor {
                 }
 
                 OfflinePlayer targetplayer = Bukkit.getOfflinePlayer(args[1]);
+
+                if (!Stats.getStats(targetplayer.getUniqueId())) {
+                    player.sendMessage("§cNo Stats for " + targetplayer.getName() + "!");
+                    return true;
+                }
 
                 player.sendMessage("§8[§6MiniGameCore§8] §6Stats for " + targetplayer.getName() + ":");
 

@@ -27,10 +27,10 @@ public class MiniGameTabCompleter implements TabCompleter {
 
         List<String> completions = new ArrayList<>();
 
-        String[] commands = {"host", "join", "ready", "unready", "confirm", "leave", "start", "spectate", "stats", "reload", "stopall", "stop", "ban", "unban"};
+        String[] commands = {"host", "join", "ready", "unready", "confirm", "leave", "start", "spectate", "unspectate","stats", "reload", "stopall", "stop", "ban", "unban"};
         String[] permissions = {
                 "mgcore.host", "mgcore.join", "mgcore.ready", "mgcore.ready", "mgcore.confirm", "mgcore.leave", "mgcore.start",
-                "mgcore.spectate", "mgcore.stats", "mgcore.admin", "mgcore.admin", "mgcore.admin", "mgcore.admin", "mgcore.admin"
+                "mgcore.spectate", "mgcore.spectate", "mgcore.stats", "mgcore.admin", "mgcore.admin", "mgcore.admin", "mgcore.admin", "mgcore.admin"
         };
 
         if (args.length == 1) {
@@ -43,14 +43,14 @@ public class MiniGameTabCompleter implements TabCompleter {
             switch (args[0].toLowerCase()) {
                 case "host":
                     if (player.hasPermission("mgcore.host")) {
-                        if (!plugin.getBannedPlayers().contains(player.getName())) {
+                        if (!plugin.getBannedPlayers().contains(player.getUniqueId())) {
                             completions = plugin.getAvailableGames();
                         }
                     }
                     break;
                 case "join":
                     if (player.hasPermission("mgcore.join")) {
-                        if (!plugin.getBannedPlayers().contains(player.getName())) {
+                        if (!plugin.getBannedPlayers().contains(player.getUniqueId())) {
                             completions = new ArrayList<>();
                             for (Lobby lobby : LobbyManager.getInstance().getOpenLobbies()) {
                                 String lobbyId = lobby.getLobbyId();
