@@ -1,5 +1,6 @@
 package wueffi.MiniGameCore.managers;
 
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -22,8 +23,10 @@ import wueffi.MiniGameCore.utils.*;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.function.Supplier;
 
 import static org.bukkit.Bukkit.getLogger;
+import static wueffi.MiniGameCore.managers.LobbyManager.lobbies;
 
 public class GameManager implements Listener {
     static final Map<Lobby, List<Player>> alivePlayers = new HashMap<>();

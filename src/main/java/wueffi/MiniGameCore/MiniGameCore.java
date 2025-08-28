@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import wueffi.MiniGameCore.commands.MiniGameCommand;
+import wueffi.MiniGameCore.commands.PartyCommand;
 import wueffi.MiniGameCore.managers.GameManager;
 import wueffi.MiniGameCore.managers.LobbyManager;
 import wueffi.MiniGameCore.managers.ScoreBoardManager;
@@ -42,6 +43,8 @@ public class MiniGameCore extends JavaPlugin {
 
         getCommand("mg").setExecutor(new MiniGameCommand(this));
         getCommand("mg").setTabCompleter(new MiniGameTabCompleter(this));
+        getCommand("party").setExecutor(new PartyCommand(this));
+        getCommand("party").setTabCompleter(new PartyTabCompleter(this));
         getLogger().info("Commands registered!");
 
         ScoreBoardManager.startAnimationLoop();

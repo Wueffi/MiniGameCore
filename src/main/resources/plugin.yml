@@ -11,6 +11,10 @@ commands:
     description: Main minigame command.
     usage: /mg <subcommand>
     permission: mgcore.use
+  party:
+    description: Main party command.
+    usage: /party <subcommand>
+    permissions: mgcore.use
 permissions:
   mgcore.use:
     default: true

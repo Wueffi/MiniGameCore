@@ -9,9 +9,11 @@ import org.jetbrains.annotations.NotNull;
 import wueffi.MiniGameCore.MiniGameCore;
 import wueffi.MiniGameCore.managers.GameManager;
 import wueffi.MiniGameCore.managers.LobbyManager;
+import wueffi.MiniGameCore.managers.PartyManager;
 import wueffi.MiniGameCore.managers.ScoreBoardManager;
 import wueffi.MiniGameCore.utils.*;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,6 +52,9 @@ public class MiniGameCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
         LobbyManager lobbyManager = LobbyManager.getInstance();
+        Party party;
+        GameConfig config;
+        Lobby lobby;
 
         if (!(sender instanceof Player player)) {
             sender.sendMessage("Yo console User, only players can use this command!");
@@ -97,10 +102,51 @@ public class MiniGameCommand implements CommandExecutor {
                     return true;
                 }
                 GameManager gameManager = new GameManager(plugin);
-                gameManager.hostGame(gameName, sender);
+                party = PartyManager.getPartyByPlayer(player);
+                if (party != null) {
+                    if (party.isOwner(player)) {
+                        config = new GameConfig(new File("Minigames/" + gameName, "config.yml"));
+                        if (party.getPlayers().size() > config.getMaxPlayers()) {
+                            player.sendMessage("§8[§6MiniGameCore§8]§c Party too big for game!");
+                            return true;
+                        }
+                        gameManager.hostGame(gameName, sender);
+                        lobby = LobbyManager.getLobbyByPlayer(player);
+                        World world = Bukkit.getWorld(lobby.getWorldFolder().getName());
+                        for (Player gamer : lobby.getPlayers()) {
+                            gamer.sendMessage("§8[§6MiniGameCore§8]§a " + player.getName() + " joined with a party of " + party.getPlayers().size() + "! " + (lobby.getPlayers().size() + party.getPlayers().size() - 1) + "/" + lobby.getMaxPlayers() + " players.");
+                        }
+                        for (Player player1 : party.getPlayers()) {
+                            if (!party.isOwner(player1) && LobbyManager.getLobbyByPlayer(player1) != null) {
+                                Lobby lobby2 = LobbyManager.getLobbyByPlayer(player1);
+                                lobby2.removePlayer(player);
+                                for (Player player2 : lobby2.getPlayers()) {
+                                    player2.sendMessage("§8[§6MiniGameCore§8]§a " + player.getName() + " left! " + (lobby2.getPlayers().size()) + "/" + lobby2.getMaxPlayers() + " players.");
+                                }
+                            }
+                            lobby.addPlayer(player1);
+                            if (world == null) {
+                                getLogger().warning("World was null! Teleporting to Owner instead. Lobby: " + lobby.getLobbyId() + ", State: " + lobby.getLobbyState());
+                                player1.teleport(lobby.getOwner().getLocation());
+                            } else {
+                                Location spawnLocation = world.getSpawnLocation();
+                                player1.teleport(spawnLocation);
+                            }
+                            PlayerHandler.PlayerSoftReset(player1);
+                            player1.setGameMode(GameMode.SURVIVAL);
+                            ScoreBoardManager.setPlayerStatus(player, "WAITING");
+                            player1.sendTitle("", "If you are ready use §a/mg ready §fto ready-up!", 0, 40, 5);
+                        }
+                    } else {
+                        player.sendMessage("§8[§6MiniGameCore§8]§c You are in a party!");
+                        return true;
+                    }
+                } else {
+                    gameManager.hostGame(gameName, sender);
+                }
                 player.sendMessage("§8[§6MiniGameCore§8]§a Hosting game: " + args[1]);
                 ScoreBoardManager.setPlayerStatus(player, "WAITING");
-                Lobby lobby = LobbyManager.getLobbyByPlayer(player);
+                lobby = LobbyManager.getLobbyByPlayer(player);
                 lobby.setLobbyState("WAITING");
                 player.sendTitle("", "If you are ready use §a/mg ready §fto ready-up!", 0, 40, 5);
                 break;
@@ -136,6 +182,45 @@ public class MiniGameCommand implements CommandExecutor {
                 if (lobby.isFull()) {
                     player.sendMessage("§8[§6MiniGameCore§8] §cLobby is already full!");
                     return true;
+                }
+
+                party = PartyManager.getPartyByPlayer(player);
+                if (party != null) {
+                    if (party.isOwner(player)) {
+                        if (party.getPlayers().size() + lobby.getMaxPlayers() > lobby.getMaxPlayers()) {
+                            player.sendMessage("§8[§6MiniGameCore§8]§c Party too big for game!");
+                            return true;
+                        }
+                        World world = Bukkit.getWorld(lobby.getWorldFolder().getName());
+                        for (Player gamer : lobby.getPlayers()) {
+                            gamer.sendMessage("§8[§6MiniGameCore§8]§a " + player.getName() + " joined with a party of " + party.getPlayers().size() + "!" + (lobby.getPlayers().size() + party.getPlayers().size()) + "/" + lobby.getMaxPlayers() + " players.");
+                        }
+                        for (Player player1 : party.getPlayers()) {
+                            if (LobbyManager.getLobbyByPlayer(player1) != null) {
+                                Lobby lobby1 = LobbyManager.getLobbyByPlayer(player1);
+                                lobby1.removePlayer(player);
+                                for (Player player2 : lobby1.getPlayers()) {
+                                    player2.sendMessage("§8[§6MiniGameCore§8]§a " + player.getName() + " left! " + (lobby1.getPlayers().size()) + "/" + lobby1.getMaxPlayers() + " players.");
+                                }
+                            }
+                            lobby.addPlayer(player1);
+                            if (world == null) {
+                                getLogger().warning("World was null! Teleporting to Owner instead. Lobby: " + lobby.getLobbyId() + ", State: " + lobby.getLobbyState());
+                                player1.teleport(lobby.getOwner().getLocation());
+                            } else {
+                                Location spawnLocation = world.getSpawnLocation();
+                                player1.teleport(spawnLocation);
+                            }
+                            PlayerHandler.PlayerSoftReset(player1);
+                            player1.setGameMode(GameMode.SURVIVAL);
+                            ScoreBoardManager.setPlayerStatus(player, "WAITING");
+                            player1.sendTitle("", "If you are ready use §a/mg ready §fto ready-up!", 0, 40, 5);
+                            return true;
+                        }
+                    } else {
+                        player.sendMessage("§8[§6MiniGameCore§8]§c You are in a party!");
+                        return true;
+                    }
                 }
 
                 if (!lobby.addPlayer(player)) {

@@ -54,11 +54,11 @@ public class ScoreBoardManager implements Listener {
         switch (status) {
             case "WAITING":
                 Lobby lobby = LobbyManager.getLobbyByPlayer(player);
-                ScoreBoard.createLobbyBoard(player, lobby);
+                if (lobby != null) ScoreBoard.createLobbyBoard(player, lobby);
                 break;
             case "GAME":
                 Lobby gameLobby = LobbyManager.getLobbyByPlayer(player);
-                ScoreBoard.createGameBoard(player, new ArrayList<>(alivePlayers.get(gameLobby)));
+                if (gameLobby != null) ScoreBoard.createGameBoard(player, new ArrayList<>(alivePlayers.get(gameLobby)));
                 break;
             default:
                 LobbyManager Lobbymanager = LobbyManager.getInstance();

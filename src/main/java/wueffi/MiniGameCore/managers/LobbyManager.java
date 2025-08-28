@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public class LobbyManager {
     private static final LobbyManager instance = new LobbyManager();
-    private static final Map<String, Lobby> lobbies = new HashMap<>();
+    static final Map<String, Lobby> lobbies = new HashMap<>();
     private final Map<String, Integer> gameCounters = new HashMap<>();
 
     private LobbyManager() {
