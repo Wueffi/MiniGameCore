@@ -6,7 +6,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import wueffi.MiniGameCore.MiniGameCore;
-import wueffi.MiniGameCore.managers.PartyManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +26,10 @@ public class PartyTabCompleter implements TabCompleter {
 
         List<String> completions = new ArrayList<>();
 
-        String[] commands = {"create", "leave", "join", "invite", "deny"};
+        String[] commands = {"create", "leave", "join", "invite", "deny", "list"};
         String[] permissions = {
-                "mgcore.party.create", "mgcore.party.join", "mgcore.party.join", "mgcore.party.invite", "mgcore.party.invite"
+                "mgcore.party.create", "mgcore.party.join", "mgcore.party.join", "mgcore.party.invite", "mgcore.party.invite",
+                "mgcore.party.list"
         };
 
         if (args.length == 1) {

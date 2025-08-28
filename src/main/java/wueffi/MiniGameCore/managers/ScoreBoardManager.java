@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.bukkit.Bukkit.getLogger;
 import static wueffi.MiniGameCore.managers.GameManager.alivePlayers;
 
 public class ScoreBoardManager implements Listener {

@@ -13,10 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import wueffi.MiniGameCore.MiniGameCore;
 import wueffi.MiniGameCore.managers.PartyManager;
 import wueffi.MiniGameCore.utils.*;
-
-import java.awt.*;
 import java.util.HashMap;
-import java.util.Map;
 
 public class PartyCommand implements CommandExecutor {
     private final MiniGameCore plugin;
@@ -31,7 +28,8 @@ public class PartyCommand implements CommandExecutor {
         commands_permissions.put("leave", "mgcore.party.join");
         commands_permissions.put("join", "mgcore.party.join");
         commands_permissions.put("invite", "mgcore.party.invite");
-        commands_permissions.put("deny", "mgcore.party.deny");
+        commands_permissions.put("deny", "mgcore.party.invite");
+        commands_permissions.put("list", "mgcore.party.list");
         return commands_permissions;
     }
 
@@ -218,6 +216,25 @@ public class PartyCommand implements CommandExecutor {
                     return true;
                 } else {
                     player.sendMessage("§8[§6MiniGameCore§8]§a You were not invited to " + party.getPartyName() + ".");
+                }
+                break;
+            case "list":
+                if (args.length > 2) {
+                    player.sendMessage("§cMissing Args! Usage: /party list");
+                    return true;
+                }
+                if (!player.hasPermission("mgcore.party.list")) {
+                    player.sendMessage("§cYou have no permissions to use this Command!");
+                    return true;
+                }
+                party = PartyManager.getPartyByPlayer(player);
+                if (party == null) {
+                    player.sendMessage("§8[§6MiniGameCore§8] §cYou are not in a party!");
+                    return true;
+                }
+                player.sendMessage("§8[§6MiniGameCore§8]§3 Party Members:");
+                for (Player player1 : party.getPlayers()) {
+                    player.sendMessage("§7- §a" + player1.getName());
                 }
                 break;
 
