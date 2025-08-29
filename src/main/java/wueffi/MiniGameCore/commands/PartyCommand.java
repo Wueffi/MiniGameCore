@@ -187,13 +187,13 @@ public class PartyCommand implements CommandExecutor {
                     return true;
                 }
                 if (party.invitePlayer(target)) {
-                    target.sendMessage("§3 You were invited to the party: §6" + party.getPartyName() + "§3!");
+                    target.sendMessage("§b " + player.getName() + "§3 invited you to a party: §6" + party.getPartyName() + "§3! (§b"+ party.getPlayers().size() + "§3P.)");
                     target.sendMessage("§f");
 
                     Component accept = Component.text("[ACCEPT]", NamedTextColor.GREEN).clickEvent(ClickEvent.runCommand("/party join " + player.getName())).hoverEvent(HoverEvent.showText(Component.text("Click to accept invitation")));
                     Component deny = Component.text("[DENY]", NamedTextColor.RED).clickEvent(ClickEvent.runCommand("/party deny " + player.getName())).hoverEvent(HoverEvent.showText(Component.text("Click to deny invitation")));
 
-                    target.sendMessage(Component.text("         ").append(accept).append(Component.text("       ")).append(deny));
+                    target.sendMessage(Component.text("             ").append(accept).append(Component.text("           ")).append(deny));
                     player.sendMessage("§8[§6MiniGameCore§8] §aYou invited " + args[1] + "!");
                 } else {
                     player.sendMessage("§8[§6MiniGameCore§8] §cCould not invite " + args[1]);

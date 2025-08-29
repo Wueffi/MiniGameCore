@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'wueffi'
-version = '1.1.3'
+version = '1.1.3.1'
 
 repositories {
     mavenCentral()
@@ -25,7 +25,7 @@ dependencies {
 tasks {
     tasks.register('copyPlugin', Copy) {
         dependsOn(jar)
-        from 'build/libs/MiniGameCore-1.1.3.jar'
+        from 'build/libs/MiniGameCore-1.1.3.1.jar'
         into 'run/plugins'
     }
     runServer {
