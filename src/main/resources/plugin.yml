@@ -1,5 +1,5 @@
 name: MiniGameCore
-version: '1.2.0'
+version: '1.2.1'
 main: wueffi.MiniGameCore.MiniGameCore
 api-version: '1.20'
 load: STARTUP

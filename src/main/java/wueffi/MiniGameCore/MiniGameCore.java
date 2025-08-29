@@ -18,6 +18,7 @@ public class MiniGameCore extends JavaPlugin {
     private final MiniGameCore plugin = this;
     private List<String> availableGames;
     private List<UUID> bannedPlayers;
+    private Boolean keepWorlds;
 
     @Override
     public void onEnable() {
@@ -26,6 +27,7 @@ public class MiniGameCore extends JavaPlugin {
 
         List<String> availableGames = getConfig().getStringList("available-games");
         List<UUID> bannedPlayers = new ArrayList<UUID>();
+        boolean keepWorlds = getConfig().getBoolean("keep-worlds");
         for (String UUIDstring : getConfig().getStringList("banned-players")) {
             try {
                 UUID uuid = UUID.fromString(UUIDstring);
@@ -36,6 +38,7 @@ public class MiniGameCore extends JavaPlugin {
         }
         this.availableGames = availableGames;
         this.bannedPlayers = bannedPlayers;
+        this.keepWorlds = keepWorlds;
         getLogger().info("Config loaded!");
 
         Stats.setup();
@@ -78,6 +81,9 @@ public class MiniGameCore extends JavaPlugin {
         return bannedPlayers;
     }
 
+    public Boolean getKeepWorlds() {
+        return keepWorlds;
+    }
     private void writeBannedPlayers() {
         List<String> bannedPlayersString = new ArrayList<>();
         for (UUID player: bannedPlayers) {

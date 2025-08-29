@@ -6,7 +6,7 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 group = 'wueffi'
-version = '1.2.0'
+version = '1.2.1'
 
 repositories {
     mavenCentral()

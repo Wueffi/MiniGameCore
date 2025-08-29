@@ -1,4 +1,4 @@
-![Static Badge](https://img.shields.io/badge/Version-1.2.0-blue)
+![Static Badge](https://img.shields.io/badge/Version-1.2.1-blue)
 # MiniGameCore
 
 **MiniGameCore** is a central plugin for managing minigame lobbies in Minecraft Paper Servers. It handles hosting, joining, starting, and stopping games – with animated scoreboards, statistics, and multiverse support.
@@ -53,7 +53,9 @@ available-games:
 banned-players:
 - 2e0749e5-4ec0-4201-b58d-c4277014749c
 - 337482fe-8a15-47f6-bea5-a84918a86393
+keep-worlds: false
 ```
+Note: if `keep-worlds: true`, the plugin is going to move them to `./plugins/MiniGameCore/ArchivedWorlds` instead of deleting them.
 
 ### Loading Game-Worlds & Configuring them
 The Folder for Gameworlds and configs is `./MiniGameCore`. Every Game World should be named like this: `<Game name>_world`. The world configs are named `config.yml` and should be located in the Game's world folder.
