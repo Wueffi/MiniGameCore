@@ -2,11 +2,15 @@ package wueffi.MiniGameCore.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 import wueffi.MiniGameCore.managers.LobbyManager;
 import wueffi.MiniGameCore.managers.ScoreBoardManager;
 
 import java.io.File;
 import java.util.*;
+
+import static wueffi.MiniGameCore.managers.GameManager.runDelayed;
+import static wueffi.MiniGameCore.managers.GameManager.timeLimitGame;
 
 public class Lobby {
     private final String lobbyId;
@@ -19,6 +23,7 @@ public class Lobby {
     private String lobbyState;
     private final List<Team> teamList = new ArrayList<>();
     private int teamCounter = 0;
+    private BukkitTask timeLimiter;
 
     public Lobby(String lobbyId, String gameName, int maxPlayers, Player owner, File worldFolder, String LobbyState) {
         this.lobbyId = lobbyId;
@@ -28,6 +33,17 @@ public class Lobby {
         this.worldFolder = worldFolder;
         this.players.add(owner.getUniqueId());
         this.lobbyState = LobbyState;
+    }
+
+    public void startTimer(int timer) {
+        if (timeLimiter != null) return;
+        timeLimiter = runDelayed(() -> timeLimitGame(this), timer);
+    }
+
+    public void endTimer() {
+        if (timeLimiter == null) return;
+        timeLimiter.cancel();
+        timeLimiter = null;
     }
 
     public boolean addPlayer(Player player) {

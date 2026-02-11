@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import wueffi.MiniGameCore.MiniGameCore;
 import wueffi.MiniGameCore.api.GameOverEvent;
 import wueffi.MiniGameCore.api.GameStartEvent;
@@ -58,6 +59,8 @@ public class GameManager implements Listener {
     }
 
     public static void endGame(Lobby lobby, Winner winner) {
+        lobby.endTimer();
+
         if (winner instanceof Winner.TieWinner(List<Player> playerList)) {
             for (Player player : lobby.getPlayers()) {
                 if (playerList.contains(player))  Stats.tie(lobby.getGameName(), player);
@@ -186,7 +189,9 @@ public class GameManager implements Listener {
                             player.getInventory().addItem(new ItemStack(material));
                         }
                         frozenPlayers.remove(player);
-                        runDelayed(() -> timeLimitGame(lobby), timeLimit);
+                        if (timeLimit > 0) {
+                            lobby.startTimer(timeLimit);
+                        }
                     }
                     cancel();
                 }
@@ -205,8 +210,8 @@ public class GameManager implements Listener {
         }
     }
 
-    public static void runDelayed(Runnable task, int seconds) {
-        Bukkit.getScheduler().runTaskLater(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("MiniGameCore")), task, seconds * 20L);
+    public static BukkitTask runDelayed(Runnable task, int seconds) {
+        return Bukkit.getScheduler().runTaskLater(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("MiniGameCore")), task, seconds * 20L);
     }
 
     public void hostGame(String gameName, CommandSender sender) {
@@ -278,6 +283,7 @@ public class GameManager implements Listener {
 
     public static void timeLimitGame(Lobby lobby) {
         List<Player> alive = alivePlayers.get(lobby);
+        lobby.endTimer();
         GameManager.endGame(lobby, new Winner.TieWinner(alive));
     }
 
