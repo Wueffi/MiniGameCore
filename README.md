@@ -79,6 +79,7 @@ All available options:
 | `blocked_damage_causes` | Stop these damage causes from happening                          | ❌ No                  |
 | `timeLimit`             | Stops a game after X seconds have passed                         | ❌ No (default: 600)   |
 | `allowFriendlyFire`     | Allow members of the same team to attack each other              | ❌ No (default: false) |
+
 Example config for an 8 player Spleef-Game:
 ```
 game:
