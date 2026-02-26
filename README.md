@@ -75,6 +75,7 @@ All available options:
 | `teamSpawnPoints`       | Spawn points per team (e.g. `0: [...]`, `1: [...]`)               | ✅ Depends             |
 | `inventory`             | Starting items at game start (e.g. `["WOODEN_SHOVEL"]`)           | ❌ No                  |
 | `allowed_break_blocks`  | Which blocks can be broken (e.g. `["SNOW_BLOCK"]`)                | ❌ No                  |
+| `allowed_place_blocks`  | Which blocks can be placed (e.g. `["OAK_PLANKS"]`)                | ❌ No                  |
 | `respawnMode`           | Control of respawn behavior: `"true"` or `"false"`                | ❌ No (default: false) |
 | `respawnDelay`          | Seconds delay until respawn (if enabled)                          | ❌ No (default: 0)     |
 | `doDurability`          | Control ItemDamage: `true` (vanilla) or `false`                   | ❌ No (default: true)  |
