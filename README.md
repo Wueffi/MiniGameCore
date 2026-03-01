@@ -84,6 +84,7 @@ All available options:
 | `timeLimit`             | Stops a game after X seconds have passed                          | ❌ No (default: 600)   |
 | `allowFriendlyFire`     | Allow members of the same team to attack each other               | ❌ No (default: false) |
 | `allowCrafting`         | Allows Players to craft items during the game                     | ❌ No (default: false) |
+| `silenceDeathMessages`  | Whether or not to silence death messages                          | ❌ No (default: false) |
 
 Example config for an 8 player Spleef-Game:
 ```

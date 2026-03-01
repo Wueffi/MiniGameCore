@@ -2,7 +2,9 @@ package wueffi.MiniGameCore.managers;
 
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -54,6 +56,7 @@ public class GameManager implements Listener {
         }
         for (Player player : lobby.getPlayers()) {
             player.sendMessage("§8[§6MiniGameCore§8]§a " + lobby.getGameName() + " is starting!");
+            lastHit.remove(player); // just to make sure
             frozenPlayers.add(player);
             PlayerSoftReset(player);
         }
@@ -403,32 +406,34 @@ public class GameManager implements Listener {
             GameConfig config = getConfig(lobby);
             Player killer = Bukkit.getPlayer(lastHit.remove(player.getUniqueId()));
 
-            if (config.getTeams() > 0) {
-                Team team = lobby.getTeamByPlayer(player);
-                String color1 = "";
-                if (team != null) color1 = team.getColorCode();
+            if (!config.getSilenceDeathMessages()) {
+                if (config.getTeams() > 0) {
+                    Team team = lobby.getTeamByPlayer(player);
+                    String color1 = "";
+                    if (team != null) color1 = team.getColorCode();
 
-                team = lobby.getTeamByPlayer(killer);
-                String color2 = "";
-                if (team != null) color2 = team.getColorCode();
+                    team = lobby.getTeamByPlayer(killer);
+                    String color2 = "";
+                    if (team != null) color2 = team.getColorCode();
 
-                if (killer != null) {
-                    for (Player player2 : lobby.getPlayers()) {
-                        player2.sendMessage( color1 + player.getName() + "§7 was killed by " + color2 + killer.getName() + "§7.");
+                    if (killer != null) {
+                        for (Player player2 : lobby.getPlayers()) {
+                            player2.sendMessage(color1 + player.getName() + "§7 was killed by " + color2 + killer.getName() + "§7.");
+                        }
+                    } else {
+                        for (Player player2 : lobby.getPlayers()) {
+                            player2.sendMessage(color1 + player.getName() + " §7died.");
+                        }
                     }
                 } else {
-                    for (Player player2 : lobby.getPlayers()) {
-                        player2.sendMessage(color1 + player.getName() + " §7died.");
-                    }
-                }
-            } else {
-                if (killer != null) {
-                    for (Player player2 : lobby.getPlayers()) {
-                        player2.sendMessage("§a" + player.getName() + "§7 was killed by §4" + killer.getName() + "§7.");
-                    }
-                } else {
-                    for (Player player2 : lobby.getPlayers()) {
-                        player2.sendMessage("§a" + player.getName() + " §7died.");
+                    if (killer != null) {
+                        for (Player player2 : lobby.getPlayers()) {
+                            player2.sendMessage("§a" + player.getName() + "§7 was killed by §4" + killer.getName() + "§7.");
+                        }
+                    } else {
+                        for (Player player2 : lobby.getPlayers()) {
+                            player2.sendMessage("§a" + player.getName() + " §7died.");
+                        }
                     }
                 }
             }
@@ -533,9 +538,18 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
-        if (!(event.getDamager() instanceof Player damager && event.getEntity() instanceof Player damaged)) return;
+        if (!(event.getEntity() instanceof Player damaged)) return;
 
-        Lobby lobby = LobbyManager.getLobbyByPlayer(damager);
+        Entity d1 = event.getDamager();
+        Player damager = null;
+
+        if (d1 instanceof Player d2) {
+            damager = d2;
+        } else if (d1 instanceof Projectile proj && proj.getShooter() instanceof Player d2) {
+            damager = d2;
+        }
+
+        Lobby lobby = LobbyManager.getLobbyByPlayer(damager); // also checks if damager is non-null
         if (lobby == null) return;
 
         if (Objects.equals(lobby.getLobbyState(), "WAITING")) {
