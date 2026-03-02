@@ -48,12 +48,15 @@ public class GameManager implements Listener {
     }
 
     public static void startGame(Lobby lobby) {
-        if (lobby.getPlayers().size() <= 1) {
+        int minPlayers = loadGameConfigFromWorld(lobby.getWorldFolder()).getMinPlayers();
+
+        if (lobby.getPlayers().size() < minPlayers) {
             for (Player player : lobby.getPlayers()) {
-                player.sendMessage("§8[§6MiniGameCore§8]§c Not enough players to start Game! (required: 2)");
+                player.sendMessage("§8[§6MiniGameCore§8]§c Not enough players to start Game! (required: " + minPlayers + ")");
                 return;
             }
         }
+
         for (Player player : lobby.getPlayers()) {
             player.sendMessage("§8[§6MiniGameCore§8]§a " + lobby.getGameName() + " is starting!");
             lastHit.remove(player); // just to make sure

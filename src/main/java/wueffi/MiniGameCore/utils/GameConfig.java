@@ -17,6 +17,7 @@ public class GameConfig {
     private final String gameName;
     private final int maxPlayers;
     private final int teams;
+    private final int minPlayers;
     private final List<SpawnPoint> spawnPoints = new ArrayList<>();
     private final List<TeamSpawnPoints> teamSpawnPoints = new ArrayList<>();
     private final List<Material> startInventory = new ArrayList<>();
@@ -37,6 +38,7 @@ public class GameConfig {
         this.gameName = config.getString("game.name", "default_game_name");
         this.maxPlayers = config.getInt("game.maxPlayers", 8);
         this.teams = config.getInt("game.teams", 0);
+        this.minPlayers = config.getInt("game.minPlayers", 2);
         this.RespawnMode = config.getBoolean("game.respawnMode", false);
         this.RespawnDelay = config.getInt("game.respawnDelay", 0);
         this.doDurability = config.getBoolean("game.doDurability", true);
@@ -112,6 +114,10 @@ public class GameConfig {
 
     public int getTeams() {
         return teams;
+    }
+
+    public int getMinPlayers() {
+        return minPlayers;
     }
 
     public List<SpawnPoint> getSpawnPoints() {
