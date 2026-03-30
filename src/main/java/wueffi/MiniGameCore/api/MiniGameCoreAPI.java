@@ -8,7 +8,6 @@ import wueffi.MiniGameCore.utils.Lobby;
 import wueffi.MiniGameCore.utils.Team;
 import wueffi.MiniGameCore.utils.Winner;
 
-import java.util.List;
 import java.util.UUID;
 
 public class MiniGameCoreAPI {

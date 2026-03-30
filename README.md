@@ -16,7 +16,7 @@
 ---
 ## 📜 Commands & Permissions
 
-Aliasses: `/p` for `/party` and `/tc` for `/teamchat`
+Aliases: `/p` for `/party` and `/tc` for `/teamchat`
 
 | Command                           | Description                                          | Permission             |
 |-----------------------------------|------------------------------------------------------|------------------------|
@@ -33,6 +33,7 @@ Aliasses: `/p` for `/party` and `/tc` for `/teamchat`
 | `/mg stopall`                     | Stop all active games                                | `mgcore.admin`         |
 | `/mg ban <player>`                | Ban the player from using most MiniGameCore commands | `mgcore.admin`         |
 | `/mg version`                     | Displays the version of MiniGameCore you are using   | `mgcore.use` (default) |
+| `/mg kick <player>`               | Kicks the player from your lobby (lobby owner only)  | `mgcore.kick`          |
 | `/party create <name>`            | Creates a new party                                  | `mgcore.party.create`  |
 | `/party join <player>`            | Join the player's Party                              | `mgcore.party.join`    |
 | `/party leave`                    | Leave your party                                     | `mgcore.party.join`    |
@@ -40,6 +41,9 @@ Aliasses: `/p` for `/party` and `/tc` for `/teamchat`
 | `/party deny`                     | Deny a player's invitation to their party            | `mgcore.party.invite`  |
 | `/party list`                     | List the Party's Members                             | `mgcore.party.list`    |
 | `/teamchat <message>`             | Sends the message to your team only                  | `mgcore.teamchat`      |
+
+Note: MiniGameCore admins (those with `mgcore.admin`) may also use `/mg kick` in a lobby, even if they aren't the lobby
+owner.
 
 ---
 
@@ -86,6 +90,7 @@ All available options:
 | `allowFriendlyFire`     | Allow members of the same team to attack each other               | ❌ No (default: false) |
 | `allowCrafting`         | Allows Players to craft items during the game                     | ❌ No (default: false) |
 | `silenceDeathMessages`  | Whether or not to silence death messages                          | ❌ No (default: false) |
+| `custom`                | Custom configuration for the game (more on this later)            | ❌ no                  |
 
 Example config for an 8 player Spleef-Game:
 ```
@@ -134,6 +139,19 @@ game:
   doDurability: false
   allowPVP: false
 ```
+
+### Custom Configs
+Those with access to the filesystem may create and edit custom configurations for the game. These live under the `custom` key (NOT under `game`).
+Example:
+```
+game:
+    # ...
+custom:
+    grace_period_length: 42
+    spawn_coin_count: 69
+```
+
+These can be accessed with `Lobby#getCustomConfig()`, which returns a `ConfigurationSection`.
 
 ## ‼️ API
 

@@ -45,6 +45,7 @@ public class MiniGameCommand implements CommandExecutor {
         commands_permissions.put("ban", "mgcore.admin");
         commands_permissions.put("unban", "mgcore.admin");
         commands_permissions.put("version", "mgcore.use");
+        commands_permissions.put("kick", "mgcore.kick");
         return commands_permissions;
     }
 
@@ -61,6 +62,9 @@ public class MiniGameCommand implements CommandExecutor {
             sender.sendMessage("Yo console User, only players can use this command!");
             return true;
         }
+
+        boolean isAdmin = player.hasPermission("mgcore.admin");
+
         HashMap<String, String> commands_permissions = getCommandsPermissions();
 
         if (args.length < 1) {
@@ -490,7 +494,7 @@ public class MiniGameCommand implements CommandExecutor {
                 break;
 
             case "stopall":
-                if (!player.hasPermission("mgcore.admin")) {
+                if (!isAdmin) {
                     player.sendMessage("§cYou have no permissions to use this Command!");
                     return true;
                 }
@@ -510,7 +514,7 @@ public class MiniGameCommand implements CommandExecutor {
                 break;
 
             case "stop":
-                if (!player.hasPermission("mgcore.admin")) {
+                if (!isAdmin) {
                     player.sendMessage("§cNo permission!");
                     return true;
                 }
@@ -533,7 +537,7 @@ public class MiniGameCommand implements CommandExecutor {
                 break;
 
             case "ban":
-                if (!player.hasPermission("mgcore.admin")) {
+                if (!isAdmin) {
                     player.sendMessage("§cYou don't have permissions to use this Command!");
                     return true;
                 }
@@ -554,7 +558,7 @@ public class MiniGameCommand implements CommandExecutor {
                 break;
 
             case "unban":
-                if (!player.hasPermission("mgcore.admin")) {
+                if (!isAdmin) {
                     player.sendMessage("§cYou don't have permissions to use this Command!");
                     return true;
                 }
@@ -574,6 +578,57 @@ public class MiniGameCommand implements CommandExecutor {
                     return true;
                 }
                 player.sendMessage("§8[§6MiniGameCore§8] §aVersion: " + plugin.getDescription().getVersion());
+                break;
+
+            case "kick":
+                lobby = LobbyManager.getLobbyByPlayer(player);
+
+                if (lobby == null) {
+                    player.sendMessage("§cYou're not in a Lobby!");
+                    return true;
+                }
+
+                if (!(lobby.isOwner(player) || isAdmin)) {
+                    player.sendMessage("§cYou aren't the owner of this Lobby!");
+                    return true;
+                }
+
+                if (!(player.hasPermission("mgcore.kick"))) {
+                    player.sendMessage("§cYou don't have permission to use this command!");
+                    return true;
+                }
+
+                if (args.length < 2) {
+                    player.sendMessage("§cMissing Args! Usage: /mg kick <player>");
+                    return true;
+                }
+
+                Player kickee = Bukkit.getPlayer(args[1]);
+
+                if (!lobby.containsPlayer(kickee)) {
+                    player.sendMessage("§cThat player isn't in this Lobby!");
+                    return true;
+                }
+
+                lobby.removePlayer(kickee);
+                PlayerHandler.PlayerReset(kickee);
+
+                kickee.sendMessage("§8[§6MiniGameCore§8]§c You were kicked from §6" + lobby.getLobbyId() + "§c!");
+
+                for (Player gamer : lobby.getPlayers()) {
+                    gamer.sendMessage("§8[§6MiniGameCore§8]§a A player has been removed from your Lobby.");
+                }
+
+                if (lobby.isOwner(kickee) || lobby.getPlayers().isEmpty()) {
+                    for (Player gamer : lobby.getPlayers()) {
+                        gamer.sendMessage("§8[§6MiniGameCore§8]§c Lobby Owner was kicked! Stopping Lobby...");
+                        PlayerHandler.PlayerReset(gamer);
+                    }
+                    LobbyHandler.LobbyReset(lobby);
+                }
+
+                ScoreBoardManager.setPlayerStatus(player, "NONE");
+
                 break;
 
             default:

@@ -49,14 +49,18 @@ public class MiniGameCore extends JavaPlugin {
         Stats.setup();
         getLogger().info("Stats loaded!");
 
+        PartyCommand partyCommand = new PartyCommand(this);
+        PartyTabCompleter partyCompleter = new PartyTabCompleter(this);
+        TeamChatCommand teamChatCommand = new TeamChatCommand(this);
+
         getCommand("mg").setExecutor(new MiniGameCommand(this));
         getCommand("mg").setTabCompleter(new MiniGameTabCompleter(this));
-        getCommand("party").setExecutor(new PartyCommand(this));
-        getCommand("party").setTabCompleter(new PartyTabCompleter(this));
-        getCommand("p").setExecutor(new PartyCommand(this));
-        getCommand("p").setTabCompleter(new PartyTabCompleter(this));
-        getCommand("teamchat").setExecutor(new TeamChatCommand(this));
-        getCommand("tc").setExecutor(new TeamChatCommand(this));
+        getCommand("party").setExecutor(partyCommand);
+        getCommand("party").setTabCompleter(partyCompleter);
+        getCommand("p").setExecutor(partyCommand);
+        getCommand("p").setTabCompleter(partyCompleter);
+        getCommand("teamchat").setExecutor(teamChatCommand);
+        getCommand("tc").setExecutor(teamChatCommand);
         getLogger().info("Commands registered!");
 
         getLogger().info("Starting cleanup task...");

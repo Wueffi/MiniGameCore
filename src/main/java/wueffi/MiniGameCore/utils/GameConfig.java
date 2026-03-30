@@ -1,6 +1,7 @@
 package wueffi.MiniGameCore.utils;
 
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -31,6 +32,7 @@ public class GameConfig {
     private final boolean allowFriendlyFire;
     private final boolean allowCrafting;
     private final boolean silenceDeathMessages;
+    private final ConfigurationSection customConfig;
 
     public GameConfig(File configFile) {
         FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
@@ -48,6 +50,7 @@ public class GameConfig {
         this.allowFriendlyFire = config.getBoolean("game.allowFriendlyFire", false);
         this.allowCrafting = config.getBoolean("game.allowCrafting", false);
         this.silenceDeathMessages = config.getBoolean("game.silenceDeathMessages", false);
+        this.customConfig = config.getConfigurationSection("custom");
 
         if (config.contains("game.spawnPoints")) {
             for (String key : config.getConfigurationSection("game.spawnPoints").getKeys(false)) {
@@ -178,6 +181,10 @@ public class GameConfig {
 
     public boolean getSilenceDeathMessages() {
         return silenceDeathMessages;
+    }
+
+    public ConfigurationSection getCustomConfig() {
+        return customConfig;
     }
 
     public record SpawnPoint(int x, int y, int z) {

@@ -27,10 +27,11 @@ public class MiniGameTabCompleter implements TabCompleter {
 
         List<String> completions = new ArrayList<>();
 
-        String[] commands = {"host", "join", "ready", "unready", "confirm", "leave", "start", "spectate", "unspectate","stats", "reload", "stopall", "stop", "ban", "unban"};
+        String[] commands = {"host", "join", "ready", "unready", "confirm", "leave", "start", "spectate", "unspectate","stats", "reload", "stopall", "stop", "ban", "unban", "kick"};
         String[] permissions = {
                 "mgcore.host", "mgcore.join", "mgcore.ready", "mgcore.ready", "mgcore.confirm", "mgcore.leave", "mgcore.start",
-                "mgcore.spectate", "mgcore.spectate", "mgcore.stats", "mgcore.admin", "mgcore.admin", "mgcore.admin", "mgcore.admin", "mgcore.admin"
+                "mgcore.spectate", "mgcore.spectate", "mgcore.stats", "mgcore.admin", "mgcore.admin", "mgcore.admin", "mgcore.admin",
+                "mgcore.admin", "mgcore.kick"
         };
 
         if (args.length == 1) {
@@ -87,6 +88,16 @@ public class MiniGameTabCompleter implements TabCompleter {
                 case "ban", "unban":
                     if (player.hasPermission("mgcore.admin")) {
                         completions = Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+                    }
+                    break;
+
+                case "kick":
+                    if (player.hasPermission("mgcore.kick")) {
+                        Lobby lobby = LobbyManager.getLobbyByPlayer(player);
+
+                        if (lobby == null || !lobby.isOwner(player)) break;
+
+                        completions = lobby.getPlayers().stream().map(Player::getName).toList();
                     }
                     break;
             }

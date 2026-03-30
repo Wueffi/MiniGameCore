@@ -1,7 +1,10 @@
 package wueffi.MiniGameCore.utils;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import wueffi.MiniGameCore.managers.GameManager;
 import wueffi.MiniGameCore.managers.LobbyManager;
 import wueffi.MiniGameCore.managers.ScoreBoardManager;
 
@@ -67,6 +70,7 @@ public class Lobby {
     }
 
     public boolean containsPlayer(Player player) {
+        if (player == null) return false; // safer
         return players.contains(player.getUniqueId());
     }
 
@@ -135,5 +139,15 @@ public class Lobby {
             }
         }
         return null;
+    }
+
+    // Convenience method
+    public GameConfig getConfig() {
+        return GameManager.getConfig(this);
+    }
+
+    // Another convenience method
+    public ConfigurationSection getCustomConfig() {
+        return getConfig().getCustomConfig();
     }
 }
