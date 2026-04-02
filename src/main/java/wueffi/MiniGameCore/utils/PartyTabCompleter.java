@@ -67,6 +67,6 @@ public class PartyTabCompleter implements TabCompleter {
 
         return completions.stream()
                 .filter(s -> s.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

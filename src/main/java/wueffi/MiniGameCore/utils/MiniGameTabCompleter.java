@@ -10,7 +10,6 @@ import wueffi.MiniGameCore.managers.LobbyManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MiniGameTabCompleter implements TabCompleter {
     private final MiniGameCore plugin;
@@ -25,13 +24,16 @@ public class MiniGameTabCompleter implements TabCompleter {
             return null;
         }
 
+        boolean isAdmin = player.hasPermission("mgcore.admin");
+
         List<String> completions = new ArrayList<>();
 
-        String[] commands = {"host", "join", "ready", "unready", "confirm", "leave", "start", "spectate", "unspectate","stats", "reload", "stopall", "stop", "ban", "unban", "kick"};
+        String[] commands = {"host", "join", "ready", "unready", "confirm", "leave", "start", "spectate", "unspectate","stats", "reload", "stopall", "stop", "ban", "unban",
+                "kick", "whereis"};
         String[] permissions = {
                 "mgcore.host", "mgcore.join", "mgcore.ready", "mgcore.ready", "mgcore.confirm", "mgcore.leave", "mgcore.start",
                 "mgcore.spectate", "mgcore.spectate", "mgcore.stats", "mgcore.admin", "mgcore.admin", "mgcore.admin", "mgcore.admin",
-                "mgcore.admin", "mgcore.kick"
+                "mgcore.admin", "mgcore.kick", "mgcore.admin"
         };
 
         if (args.length == 1) {
@@ -62,7 +64,7 @@ public class MiniGameTabCompleter implements TabCompleter {
                     break;
                 case "spectate":
                     if (player.hasPermission("mgcore.spectate")) {
-                        completions = Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+                        completions = Bukkit.getOnlinePlayers().stream().map(Player::getName).toList();
                         for (Lobby lobby : LobbyManager.getInstance().getOpenLobbies()) {
                             String lobbyId = lobby.getLobbyId();
                             completions.add(lobbyId);
@@ -73,11 +75,11 @@ public class MiniGameTabCompleter implements TabCompleter {
                     if (player.hasPermission("mgcore.stats")) {
                         completions = Bukkit.getOnlinePlayers().stream()
                                 .map(Player::getName)
-                                .collect(Collectors.toList());
+                                .toList();
                     }
                     break;
                 case "stop":
-                    if (player.hasPermission("mgcore.admin")) {
+                    if (isAdmin) {
                         completions = new ArrayList<>();
                         for (Lobby lobby : LobbyManager.getInstance().getOpenLobbies()) {
                             String lobbyId = lobby.getLobbyId();
@@ -86,8 +88,8 @@ public class MiniGameTabCompleter implements TabCompleter {
                     }
                     break;
                 case "ban", "unban":
-                    if (player.hasPermission("mgcore.admin")) {
-                        completions = Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+                    if (isAdmin) {
+                        completions = Bukkit.getOnlinePlayers().stream().map(Player::getName).toList();
                     }
                     break;
 
@@ -95,7 +97,7 @@ public class MiniGameTabCompleter implements TabCompleter {
                     if (player.hasPermission("mgcore.kick")) {
                         Lobby lobby = LobbyManager.getLobbyByPlayer(player);
 
-                        if (lobby == null || !lobby.isOwner(player)) break;
+                        if (lobby == null || !lobby.isOwner(player) || !isAdmin) break;
 
                         completions = lobby.getPlayers().stream().map(Player::getName).toList();
                     }
@@ -105,6 +107,6 @@ public class MiniGameTabCompleter implements TabCompleter {
 
         return completions.stream()
                 .filter(s -> s.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
-                .collect(Collectors.toList());
+                .toList();
     }
 }
