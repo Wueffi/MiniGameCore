@@ -29,7 +29,7 @@ public class MiniGameTabCompleter implements TabCompleter {
         List<String> completions = new ArrayList<>();
 
         String[] commands = {"host", "join", "ready", "unready", "confirm", "leave", "start", "spectate", "unspectate","stats", "reload", "stopall", "stop", "ban", "unban",
-                "kick", "whereis"};
+                "kick"};
         String[] permissions = {
                 "mgcore.host", "mgcore.join", "mgcore.ready", "mgcore.ready", "mgcore.confirm", "mgcore.leave", "mgcore.start",
                 "mgcore.spectate", "mgcore.spectate", "mgcore.stats", "mgcore.admin", "mgcore.admin", "mgcore.admin", "mgcore.admin",
