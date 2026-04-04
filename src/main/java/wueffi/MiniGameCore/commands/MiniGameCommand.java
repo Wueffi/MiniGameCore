@@ -627,7 +627,7 @@ public class MiniGameCommand implements CommandExecutor {
                     LobbyHandler.LobbyReset(lobby);
                 }
 
-                ScoreBoardManager.setPlayerStatus(player, "NONE");
+                ScoreBoardManager.setPlayerStatus(kickee, "NONE");
 
                 break;
 
