@@ -12,7 +12,7 @@ import java.util.Objects;
 import static java.nio.file.Files.move;
 import static org.bukkit.Bukkit.getServer;
 
-public class CleanUpWorlds {
+public final class CleanUpWorlds {
 
     public static int worldsDeleted = 0;
     private static final File serverDirectory = getServer().getWorldContainer();

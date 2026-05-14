@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -11,10 +12,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class GameConfig {
+public final class GameConfig {
     public final boolean RespawnMode;
     public final int RespawnDelay;
     private final String gameName;
+    private final String hostPerm;
+    private final String joinPerm;
     private final int maxPlayers;
     private final int teams;
     private final int minPlayers;
@@ -31,11 +34,14 @@ public class GameConfig {
     private final boolean allowFriendlyFire;
     private final boolean allowCrafting;
     private final boolean silenceDeathMessages;
+    private final boolean doHunger;
 
     public GameConfig(File configFile) {
         FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
 
         this.gameName = config.getString("game.name", "default_game_name");
+        this.hostPerm = config.getString("game.hostPerm", "mgcore.host");
+        this.joinPerm = config.getString("game.joinPerm", "mgcore.join");
         this.maxPlayers = config.getInt("game.maxPlayers", 8);
         this.teams = config.getInt("game.teams", 0);
         this.minPlayers = config.getInt("game.minPlayers", 2);
@@ -48,6 +54,7 @@ public class GameConfig {
         this.allowFriendlyFire = config.getBoolean("game.allowFriendlyFire", false);
         this.allowCrafting = config.getBoolean("game.allowCrafting", false);
         this.silenceDeathMessages = config.getBoolean("game.silenceDeathMessages", false);
+        this.doHunger = config.getBoolean("game.doHunger", false);
 
         if (config.contains("game.spawnPoints")) {
             for (String key : config.getConfigurationSection("game.spawnPoints").getKeys(false)) {
@@ -106,6 +113,14 @@ public class GameConfig {
                 } catch (IllegalArgumentException ignored) {} // _ works in 22+, if we ever migrate to Java 22+, change this to _
             }
         }
+    }
+
+    public @NotNull String getHostPerm() {
+        return hostPerm;
+    }
+
+    public @NotNull String getJoinPerm() {
+        return joinPerm;
     }
 
     public int getMaxPlayers() {
@@ -178,6 +193,10 @@ public class GameConfig {
 
     public boolean getSilenceDeathMessages() {
         return silenceDeathMessages;
+    }
+
+    public boolean getDoHunger() {
+        return doHunger;
     }
 
     public record SpawnPoint(int x, int y, int z) {

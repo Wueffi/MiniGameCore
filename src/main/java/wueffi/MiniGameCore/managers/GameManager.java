@@ -12,6 +12,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -31,13 +32,13 @@ import java.util.*;
 
 import static wueffi.MiniGameCore.utils.PlayerHandler.PlayerSoftReset;
 
-public class GameManager implements Listener {
+public final class GameManager implements Listener {
     static final Map<Lobby, List<Player>> alivePlayers = new HashMap<>();
-    public static final Set<Player> frozenPlayers = new HashSet<>();
+    private static final Set<Player> frozenPlayers = new HashSet<>();
     static Map<UUID, Location> playerRespawnPoints = new HashMap<>();
     private static MiniGameCore plugin;
     private static final Map<UUID, UUID> lastHit = new HashMap<>();
-    static final Map<Lobby, GameConfig> configCache = new HashMap<>();
+    private static final Map<Lobby, GameConfig> configCache = new HashMap<>();
 
     public GameManager(MiniGameCore plugin) {
         GameManager.plugin = plugin;
@@ -228,7 +229,7 @@ public class GameManager implements Listener {
         Bukkit.getScheduler().runTaskLater(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("MiniGameCore")), task, seconds * 20L);
     }
 
-    public void hostGame(String gameName, CommandSender sender) {
+    public static Lobby hostGame(String gameName, CommandSender sender) {
         Player player = (Player) sender;
 
         String originalWorldName = gameName + "_world";
@@ -237,7 +238,7 @@ public class GameManager implements Listener {
         File originalWorldFolder = new File("plugins/MiniGameCore/MiniGames", originalWorldName);
         if (!originalWorldFolder.exists()) {
             plugin.getLogger().warning("Template world " + originalWorldName + " not found in" + originalWorldFolder.getAbsolutePath() + ".");
-            return;
+            return null;
         }
 
         File newWorldFolder = new File(Bukkit.getWorldContainer(), newWorldName);
@@ -247,19 +248,19 @@ public class GameManager implements Listener {
                 copyWorldFolder(originalWorldFolder, newWorldFolder);
             } catch (Exception e) {
                 plugin.getLogger().warning("Failed to copy world: " + e.getMessage());
-                return;
+                return null;
             }
             plugin.getLogger().info("World copied successfully.");
         } else {
             plugin.getLogger().warning("World folder " + originalWorldName + " not found.");
-            return;
+            return null;
         }
 
         World newWorld = Bukkit.createWorld(new WorldCreator(newWorldFolder.getName()));
 
         if (newWorld == null) {
             plugin.getLogger().warning("Failed to load copied world: " + newWorldName);
-            return;
+            return null;
         } else {
             Location spawnLocation = newWorld.getSpawnLocation();
             player.teleport(spawnLocation);
@@ -271,43 +272,42 @@ public class GameManager implements Listener {
 
         if (LobbyManager.getLobbyByPlayer(player) != null) {
             player.sendMessage("§8[§6MiniGameCore§8]§c You are already in a game or lobby!");
-            return;
+            return null;
         }
 
         GameConfig gameConfig = loadGameConfigFromWorld(newWorldFolder);
         int maxPlayers = gameConfig.getMaxPlayers();
 
-        LobbyManager lobbyManager = LobbyManager.getInstance();
-        Lobby lobby = lobbyManager.createLobby(gameName, maxPlayers, player, newWorldFolder);
+        Lobby lobby = LobbyManager.createLobby(gameName, maxPlayers, player, newWorldFolder);
 
         if (lobby == null) {
             player.sendMessage("§8[§6MiniGameCore§8]§c Lobby could not be created!");
-            return;
+            return null;
         }
 
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            onlinePlayer.sendMessage("§8[§6MiniGameCore§8]§a " + player.getName() + " is hosting " + lobby.getGameName() + "! " +
-                    lobby.getPlayers().size() + "/" + maxPlayers + " players - type /mg join " + lobby.getLobbyId() + " to join the fun!");
-        }
+        Bukkit.broadcast("§8[§6MiniGameCore§8]§a " + player.getName() + " is hosting " + lobby.getGameName() + "! " +
+                lobby.getPlayers().size() + "/" + maxPlayers + " players - type /mg join " + lobby.getLobbyId() + " to join the fun!", gameConfig.getJoinPerm());
 
         if (lobby.isFull()) {
             startGame(lobby);
         }
+
+        return lobby;
     }
 
     public static void timeLimitGame(Lobby lobby) {
-        if (LobbyManager.getInstance().getClosedLobbies().contains(lobby) || LobbyManager.getInstance().getOpenLobbies().contains(lobby)) {
+        if (LobbyManager.getClosedLobbies().contains(lobby) || LobbyManager.getOpenLobbies().contains(lobby)) {
             List<Player> alive = alivePlayers.get(lobby);
             GameManager.endGame(lobby, new Winner.TieWinner(alive));
         }
     }
 
-    public static void removeLastHitandFrozen(UUID uuid) {
+    public static void removeLastHitAndFrozen(UUID uuid) {
         lastHit.remove(uuid);
         if (Bukkit.getPlayer(uuid) != null) frozenPlayers.remove(Bukkit.getPlayer(uuid));
     }
 
-    private void copyWorldFolder(File source, File destination) throws Exception {
+    private static void copyWorldFolder(File source, File destination) throws Exception {
         if (!source.exists()) {
             throw new Exception("Source folder does not exist.");
         }
@@ -358,6 +358,10 @@ public class GameManager implements Listener {
 
         alivePlayers.remove(lobby);
         alivePlayers.put(lobby, alivePlayersNew);
+    }
+
+    public static void clearFrozenPlayers() {
+        frozenPlayers.clear();
     }
 
     @EventHandler
@@ -632,5 +636,17 @@ public class GameManager implements Listener {
             player.sendMessage("§7[§6MiniGameCore§7]§c You are not allowed to craft!");
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onHunger(FoodLevelChangeEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return; // annoyingly it uses HumanEntity :(
+        Lobby lobby = LobbyManager.getLobbyByPlayer(player);
+        if (lobby == null) return;
+        GameConfig config = getConfig(lobby);
+
+        if (config.getDoHunger()) return;
+
+        event.setCancelled(true);
     }
 }

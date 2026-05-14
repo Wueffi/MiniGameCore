@@ -15,27 +15,27 @@ import wueffi.MiniGameCore.managers.PartyManager;
 import wueffi.MiniGameCore.utils.*;
 import java.util.HashMap;
 
-public class PartyCommand implements CommandExecutor {
+public final class PartyCommand implements CommandExecutor {
     private final MiniGameCore plugin;
-
+    private static final HashMap<String, String> commandsPermissions = new HashMap<>();
     public PartyCommand(MiniGameCore plugin) {
         this.plugin = plugin;
     }
 
-    private static @NotNull HashMap<String, String> getCommandsPermissions() {
-        HashMap<String, String> commands_permissions = new HashMap<>();
-        commands_permissions.put("create", "mgcore.party.create");
-        commands_permissions.put("leave", "mgcore.party.join");
-        commands_permissions.put("join", "mgcore.party.join");
-        commands_permissions.put("invite", "mgcore.party.invite");
-        commands_permissions.put("deny", "mgcore.party.invite");
-        commands_permissions.put("list", "mgcore.party.list");
-        return commands_permissions;
+    public static @NotNull HashMap<String, String> getCommandsPermissions() {
+        if (commandsPermissions.isEmpty()) {
+            commandsPermissions.put("create", "mgcore.party.create");
+            commandsPermissions.put("leave", "mgcore.party.join");
+            commandsPermissions.put("join", "mgcore.party.join");
+            commandsPermissions.put("invite", "mgcore.party.invite");
+            commandsPermissions.put("deny", "mgcore.party.invite");
+            commandsPermissions.put("list", "mgcore.party.list");
+        }
+        return commandsPermissions;
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String @NotNull [] args) {
-        PartyManager partyManager = PartyManager.getInstance();
         Party party;
         Player target;
 
@@ -43,13 +43,13 @@ public class PartyCommand implements CommandExecutor {
             sender.sendMessage("Only players can use this command!");
             return true;
         }
-        HashMap<String, String> commands_permissions = getCommandsPermissions();
+        HashMap<String, String> commandsPermissions = getCommandsPermissions();
 
         if (args.length < 1) {
             StringBuilder availableCommands = new StringBuilder("§fUsage: §6/party <");
 
-            for (String command: commands_permissions.keySet()) {
-                if (player.hasPermission(commands_permissions.get(command))) {
+            for (String command: commandsPermissions.keySet()) {
+                if (player.hasPermission(commandsPermissions.get(command))) {
                     availableCommands.append(command).append(" | ");
                 }
             }
@@ -80,9 +80,8 @@ public class PartyCommand implements CommandExecutor {
                     return true;
                 }
                 String partyName = args[1];
-                party = partyManager.createParty(partyName, player);
-                if (party == null) player.sendMessage("§8[§6MiniGameCore§8]§a You created the party: " + args[1]) ;
-                else player.sendMessage("§8[§6MiniGameCore§8]§a You created the party: " + party.getPartyName());
+                party = PartyManager.createParty(partyName, player);
+                player.sendMessage("§8[§6MiniGameCore§8]§a You created the party: " + party.getPartyName());
                 break;
             case "leave":
                 if (args.length != 1) {

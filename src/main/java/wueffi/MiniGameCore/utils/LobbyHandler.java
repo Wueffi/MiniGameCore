@@ -13,7 +13,7 @@ import static java.nio.file.Files.move;
 import static org.bukkit.Bukkit.getLogger;
 import static wueffi.MiniGameCore.managers.LobbyManager.removeLobby;
 
-public class LobbyHandler {
+public final class LobbyHandler {
     private static MiniGameCore plugin;
 
     public static void LobbyReset(Lobby lobby) {

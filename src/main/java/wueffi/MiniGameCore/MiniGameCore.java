@@ -16,12 +16,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public class MiniGameCore extends JavaPlugin {
+public final class MiniGameCore extends JavaPlugin {
     private final MiniGameCore plugin = this;
     private List<String> availableGames;
     private List<UUID> bannedPlayers;
     private Boolean keepWorlds;
-    private LobbyManager lobbyManager;
 
     @Override
     public void onEnable() {
@@ -65,7 +64,6 @@ public class MiniGameCore extends JavaPlugin {
         if (!disableScoreBoard) ScoreBoardManager.startAnimationLoop();
 
         LobbyHandler.setPlugin(this);
-        lobbyManager = LobbyManager.getInstance();
 
         Bukkit.getPluginManager().registerEvents(new GameManager(this), this);
         getServer().getPluginManager().registerEvents(new PlayerHandler(this), this);
@@ -73,7 +71,7 @@ public class MiniGameCore extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        for (Lobby lobby : Stream.concat(lobbyManager.getOpenLobbies().stream(), lobbyManager.getClosedLobbies().stream()).toList()) {
+        for (Lobby lobby : Stream.concat(LobbyManager.getOpenLobbies().stream(), LobbyManager.getClosedLobbies().stream()).toList()) {
             String lobbyid = lobby.getLobbyId();
             for (Player player : lobby.getPlayers()) {
                 PlayerHandler.PlayerReset(player);
@@ -82,7 +80,7 @@ public class MiniGameCore extends JavaPlugin {
             LobbyHandler.LobbyReset(lobby);
             getLogger().info("Shut down Lobby: " + lobbyid);
         }
-        GameManager.frozenPlayers.clear();
+        GameManager.clearFrozenPlayers();
         getLogger().info("Starting cleanup task...");
         CleanUpWorlds.cleanUpWorlds(this);
         getLogger().info("MinigameCore disabled!");

@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
-public class Team {
+public final class Team {
     private final String teamId;
     private final HashSet<UUID> players = new HashSet<>();
     private int alivePlayers;

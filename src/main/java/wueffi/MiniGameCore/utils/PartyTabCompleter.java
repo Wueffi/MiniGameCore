@@ -7,13 +7,15 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import wueffi.MiniGameCore.MiniGameCore;
+import wueffi.MiniGameCore.commands.PartyCommand;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class PartyTabCompleter implements TabCompleter {
+public final class PartyTabCompleter implements TabCompleter {
     private final MiniGameCore plugin;
-
+    private static final Map<String, String> commandsPermissions = PartyCommand.getCommandsPermissions();
     public PartyTabCompleter(MiniGameCore plugin) {
         this.plugin = plugin;
     }
@@ -26,43 +28,25 @@ public class PartyTabCompleter implements TabCompleter {
 
         List<String> completions = new ArrayList<>();
 
-        String[] commands = {"create", "leave", "join", "invite", "deny", "list"};
-        String[] permissions = {
-                "mgcore.party.create", "mgcore.party.join", "mgcore.party.join", "mgcore.party.invite", "mgcore.party.invite",
-                "mgcore.party.list"
-        };
-
         if (args.length == 1) {
-            for (int i = 0; i < commands.length; i++) {
-                if (player.hasPermission(permissions[i])) {
-                    completions.add(commands[i]);
-                }
-            }
+            completions = commandsPermissions.entrySet().stream()
+                    .filter(e -> player.hasPermission(e.getValue()))
+                    .map(Map.Entry::getKey)
+                    .toList();
         } else if (args.length == 2) {
-            switch (args[0].toLowerCase()) {
-                case "join":
-                    if (player.hasPermission("mgcore.party.join")) {
-                        if (!plugin.getBannedPlayers().contains(player.getUniqueId())) {
-                            completions = new ArrayList<>();
-                            for (Player player1 : Bukkit.getOnlinePlayers()) {
-                                String Name = player1.getName();
-                                completions.add(Name);
-                            }
-                        }
-                    }
-                    break;
-                case "invite", "deny":
-                    if (player.hasPermission("mgcore.party.invite")) {
-                        if (!plugin.getBannedPlayers().contains(player.getUniqueId())) {
-                            completions = new ArrayList<>();
-                            for (Player player1 : Bukkit.getOnlinePlayers()) {
-                                String Name = player1.getName();
-                                completions.add(Name);
-                            }
-                        }
-                    }
-                    break;
+            String subcmd = args[0].toLowerCase();
+
+            if (!(commandsPermissions.containsKey(subcmd) && player.hasPermission(commandsPermissions.get(subcmd)))) {
+                return completions;
             }
+
+            switch (subcmd) {
+                case "join", "invite", "deny":
+                    if (!plugin.getBannedPlayers().contains(player.getUniqueId())) {
+                        completions = Bukkit.getOnlinePlayers().stream().map(Player::getName).toList();
+                    }
+                    break;
+            } // well that was easy
         }
 
         return completions.stream()

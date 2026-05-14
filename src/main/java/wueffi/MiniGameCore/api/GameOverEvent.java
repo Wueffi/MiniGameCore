@@ -5,7 +5,7 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 import wueffi.MiniGameCore.utils.Lobby;
 
-public class GameOverEvent extends Event {
+public final class GameOverEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 

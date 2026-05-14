@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Stats {
+public final class Stats {
 
     private static File statsFile;
     private static FileConfiguration statsConfig;

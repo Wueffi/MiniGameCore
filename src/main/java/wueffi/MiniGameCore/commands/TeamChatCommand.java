@@ -9,7 +9,7 @@ import wueffi.MiniGameCore.managers.LobbyManager;
 import wueffi.MiniGameCore.utils.Lobby;
 import wueffi.MiniGameCore.utils.Team;
 
-public class TeamChatCommand implements CommandExecutor {
+public final class TeamChatCommand implements CommandExecutor {
 
     public TeamChatCommand() {
     }

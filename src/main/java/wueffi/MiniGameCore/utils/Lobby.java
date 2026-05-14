@@ -7,8 +7,9 @@ import wueffi.MiniGameCore.managers.ScoreBoardManager;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class Lobby {
+public final class Lobby {
     private final String lobbyId;
     private final String gameName;
     private final int maxPlayers;
@@ -72,14 +73,10 @@ public class Lobby {
     }
 
     public Set<Player> getPlayers() {
-        Set<Player> result = new HashSet<>();
-        for (UUID uuid : players) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                result.add(player);
-            }
-        }
-        return result;
+        return players.stream()
+                .map(Bukkit::getPlayer)
+                .filter(p -> p != null)
+                .collect(Collectors.toSet());
     }
 
     public List<Team> getTeamList() {

@@ -10,13 +10,7 @@ import wueffi.MiniGameCore.utils.Winner;
 
 import java.util.UUID;
 
-public class MiniGameCoreAPI {
-    private static final LobbyManager lobbyManager = LobbyManager.getInstance();
-
-    public static LobbyManager getLobbyManager() {
-        return lobbyManager;
-    }
-
+public final class MiniGameCoreAPI {
     public static void winPlayer(Lobby lobby, Player player) {
         GameManager.endGame(lobby, new Winner.PlayerWinner(player));
     }

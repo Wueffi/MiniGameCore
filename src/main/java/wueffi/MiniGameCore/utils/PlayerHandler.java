@@ -12,7 +12,7 @@ import wueffi.MiniGameCore.managers.GameManager;
 import wueffi.MiniGameCore.managers.LobbyManager;
 import wueffi.MiniGameCore.managers.PartyManager;
 
-public class PlayerHandler implements Listener {
+public final class PlayerHandler implements Listener {
 
     private static Plugin plugin;
 
@@ -85,9 +85,8 @@ public class PlayerHandler implements Listener {
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        GameManager.removeLastHitandFrozen(player.getUniqueId());
+        GameManager.removeLastHitAndFrozen(player.getUniqueId());
         GameManager.playerDeath(player.getUniqueId());
         Bukkit.getScheduler().runTaskLater(plugin, () -> PlayerReset(player), 5L);
-        GameManager.frozenPlayers.remove(player);
     }
 }

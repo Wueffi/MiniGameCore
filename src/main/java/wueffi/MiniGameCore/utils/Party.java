@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Party {
+public final class Party {
     private final String partyId;
     private final String partyName;
     private final Player owner;

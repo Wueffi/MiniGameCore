@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ScoreBoard {
+public final class ScoreBoard {
 
     private static final List<String> animations = Arrays.asList("§b§l» Lobbies", "§b§l» Stats");
     private static final String TITLE = "§6§lMiniGameCore";

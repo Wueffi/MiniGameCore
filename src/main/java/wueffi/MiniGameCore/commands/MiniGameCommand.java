@@ -19,40 +19,38 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static org.bukkit.Bukkit.getLogger;
-
-public class MiniGameCommand implements CommandExecutor {
+public final class MiniGameCommand implements CommandExecutor {
     private final MiniGameCore plugin;
+    private static final Map<Player, Lobby> confirmations = new HashMap<>();
+    private static final HashMap<String, String> commandsPermissions = new HashMap<>();
 
     public MiniGameCommand(MiniGameCore plugin) {
         this.plugin = plugin;
     }
 
-    private static @NotNull HashMap<String, String> getCommandsPermissions() {
-        HashMap<String, String> commands_permissions = new HashMap<>();
-        commands_permissions.put("host", "mgcore.host");
-        commands_permissions.put("join", "mgcore.join");
-        commands_permissions.put("confirm", "mgcore.confirm");
-        commands_permissions.put("ready", "mgcore.ready");
-        commands_permissions.put("unready", "mgcore.unready");
-        commands_permissions.put("leave", "mgcore.leave");
-        commands_permissions.put("start", "mgcore.start");
-        commands_permissions.put("spectate", "mgcore.spectate");
-        commands_permissions.put("unspectate", "mgcore.unspectate");
-        commands_permissions.put("reload", "mgcore.admin");
-        commands_permissions.put("stopall", "mgcore.admin");
-        commands_permissions.put("stop", "mgcore.admin");
-        commands_permissions.put("ban", "mgcore.admin");
-        commands_permissions.put("unban", "mgcore.admin");
-        commands_permissions.put("version", "mgcore.use");
-        return commands_permissions;
+    public static @NotNull HashMap<String, String> getCommandsPermissions() {
+        if (commandsPermissions.isEmpty()) {
+            commandsPermissions.put("host", "mgcore.host");
+            commandsPermissions.put("join", "mgcore.join");
+            commandsPermissions.put("confirm", "mgcore.confirm");
+            commandsPermissions.put("ready", "mgcore.ready");
+            commandsPermissions.put("unready", "mgcore.unready");
+            commandsPermissions.put("leave", "mgcore.leave");
+            commandsPermissions.put("start", "mgcore.start");
+            commandsPermissions.put("spectate", "mgcore.spectate");
+            commandsPermissions.put("unspectate", "mgcore.unspectate");
+            commandsPermissions.put("reload", "mgcore.admin");
+            commandsPermissions.put("stopall", "mgcore.admin");
+            commandsPermissions.put("stop", "mgcore.admin");
+            commandsPermissions.put("ban", "mgcore.admin");
+            commandsPermissions.put("unban", "mgcore.admin");
+            commandsPermissions.put("version", "mgcore.use");
+        }
+        return commandsPermissions;
     }
-
-    private static final Map<Player, Lobby> confirmations = new HashMap<>();
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String @NotNull [] args) {
-        LobbyManager lobbyManager = LobbyManager.getInstance();
         Party party;
         GameConfig config;
         Lobby lobby;
@@ -61,13 +59,13 @@ public class MiniGameCommand implements CommandExecutor {
             sender.sendMessage("Yo console User, only players can use this command!");
             return true;
         }
-        HashMap<String, String> commands_permissions = getCommandsPermissions();
+        HashMap<String, String> commandsPermissions = getCommandsPermissions();
 
         if (args.length < 1) {
             StringBuilder availableCommands = new StringBuilder("§fUsage: §6/mg <");
 
-            for (String command: commands_permissions.keySet()) {
-                if (player.hasPermission(commands_permissions.get(command))) {
+            for (String command: commandsPermissions.keySet()) {
+                if (player.hasPermission(commandsPermissions.get(command))) {
                     availableCommands.append(command).append(" | ");
                 }
             }
@@ -79,7 +77,19 @@ public class MiniGameCommand implements CommandExecutor {
             return true;
         }
 
-        switch (args[0].toLowerCase()) {
+        String subcmd = args[0].toLowerCase();
+
+        if (!commandsPermissions.containsKey(subcmd)) {
+            player.sendMessage("§8[§6MiniGameCore§8] §cUnknown subcommand!");
+            return true;
+        }
+
+        if (!(player.hasPermission(commandsPermissions.get(subcmd)) || player.hasPermission("mgcore.admin"))) {
+            player.sendMessage("§8[§6MiniGameCore§8] §cYou don't have permission to use that subcommand!!");
+            return true;
+        }
+
+        switch (subcmd) {
             case "host":
                 if (plugin.getBannedPlayers().contains(player.getUniqueId())) {
                     player.sendMessage("§cYou were banned by an Administrator.");
@@ -87,10 +97,6 @@ public class MiniGameCommand implements CommandExecutor {
                 }
                 if (args.length < 2) {
                     player.sendMessage("§cMissing Args! Usage: /mg host <game>");
-                    return true;
-                }
-                if (!player.hasPermission("mgcore.host")) {
-                    player.sendMessage("§cYou have no permissions to use this Command!");
                     return true;
                 }
                 if (LobbyManager.getLobbyByPlayer(player) != null) {
@@ -102,17 +108,22 @@ public class MiniGameCommand implements CommandExecutor {
                     player.sendMessage("§8[§6MiniGameCore§8] §cGame " + gameName + " not available!");
                     return true;
                 }
-                GameManager gameManager = new GameManager(plugin);
                 party = PartyManager.getPartyByPlayer(player);
                 if (party != null) {
                     if (party.isOwner(player)) {
                         config = new GameConfig(new File("Minigames/" + gameName, "config.yml"));
+                        if (!player.hasPermission(config.getHostPerm())) {
+                            player.sendMessage("§8[§6MiniGameCore§8] §cYou don't have permission to host " + gameName + "!");
+                            return true;
+                        }
                         if (party.getPlayers().size() > config.getMaxPlayers()) {
                             player.sendMessage("§8[§6MiniGameCore§8]§c Party too big for game!");
                             return true;
                         }
-                        gameManager.hostGame(gameName, sender);
-                        lobby = LobbyManager.getLobbyByPlayer(player);
+                        lobby = GameManager.hostGame(gameName, sender);
+                        if (lobby == null) {
+                            return true; // the game manager already sent the message for us
+                        }
                         World world = Bukkit.getWorld(lobby.getWorldFolder().getName());
                         for (Player gamer : lobby.getPlayers()) {
                             gamer.sendMessage("§8[§6MiniGameCore§8]§a " + player.getName() + " joined with a party of " + party.getPlayers().size() + "! " + (lobby.getPlayers().size() + party.getPlayers().size() - 1) + "/" + lobby.getMaxPlayers() + " players.");
@@ -143,11 +154,10 @@ public class MiniGameCommand implements CommandExecutor {
                         return true;
                     }
                 } else {
-                    gameManager.hostGame(gameName, sender);
+                    lobby = GameManager.hostGame(gameName, sender); // again, it handled the message for us
                 }
                 player.sendMessage("§8[§6MiniGameCore§8]§a Hosting game: " + args[1]);
                 ScoreBoardManager.setPlayerStatus(player, "WAITING");
-                lobby = LobbyManager.getLobbyByPlayer(player);
                 lobby.setLobbyState("WAITING");
                 player.sendTitle("", "If you are ready use §a/mg ready §fto ready-up!", 0, 40, 5);
                 break;
@@ -163,7 +173,7 @@ public class MiniGameCommand implements CommandExecutor {
                 }
 
                 String lobbyName = args[1];
-                lobby = lobbyManager.getLobby(lobbyName);
+                lobby = LobbyManager.getLobby(lobbyName);
 
                 if (lobby == null) {
                     player.sendMessage("§8[§6MiniGameCore§8] §cLobby not found!");
@@ -246,10 +256,6 @@ public class MiniGameCommand implements CommandExecutor {
                 break;
 
             case "confirm":
-                if (!player.hasPermission("mgcore.confirm")) {
-                    player.sendMessage("§cYou have no permissions to use this Command!");
-                    return true;
-                }
                 if (args.length >= 2) {
                     player.sendMessage("§cToo many Args! Usage: /mg confirm");
                     return true;
@@ -277,10 +283,6 @@ public class MiniGameCommand implements CommandExecutor {
                 GameManager.startGame(confirmLobby);
 
             case "ready":
-                if (!player.hasPermission("mgcore.ready")) {
-                    player.sendMessage("§cYou have no permissions to use this Command!");
-                    return true;
-                }
                 if (args.length >= 2) {
                 player.sendMessage("§cToo many Args! Usage: /mg unready");
                     return true;
@@ -306,10 +308,6 @@ public class MiniGameCommand implements CommandExecutor {
                 break;
 
             case "unready":
-                if (!player.hasPermission("mgcore.unready")) {
-                    player.sendMessage("§cYou have no permissions to use this Command!");
-                    return true;
-                }
                 if (args.length >= 2) {
                     player.sendMessage("§cToo many Args! Usage: /mg unready");
                     return true;
@@ -369,11 +367,6 @@ public class MiniGameCommand implements CommandExecutor {
 
 
             case "start":
-                if (!player.hasPermission("mgcore.start")) {
-                    player.sendMessage("§cYou have no permissions to use this command!");
-                    return true;
-                }
-
                 lobby = LobbyManager.getLobbyByPlayer(player);
                 if (lobby == null) {
                     player.sendMessage("§8[§6MiniGameCore§8] §cYou are not in a lobby!");
@@ -398,10 +391,6 @@ public class MiniGameCommand implements CommandExecutor {
                     player.sendMessage("§cMissing Args! Usage: /mg spectate <game|player>");
                     return true;
                 }
-                if (!player.hasPermission("mgcore.spectate")) {
-                    player.sendMessage("§cYou have no permissions to use this Command!");
-                    return true;
-                }
                 if (LobbyManager.getLobbyByPlayer(player) != null) {
                     player.sendMessage("§8[§6MiniGameCore§8] §cYou are already in a game! Type /mg leave to leave!");
                     return true;
@@ -415,7 +404,7 @@ public class MiniGameCommand implements CommandExecutor {
                     player.teleport(targetPlayer);
                     player.setGameMode(GameMode.SPECTATOR);
                 } else {
-                    lobby = LobbyManager.getInstance().getLobby(target);
+                    lobby = LobbyManager.getLobby(target);
                     if (lobby != null) {
                         player.sendMessage("§8[§6MiniGameCore§8] §aYou are now spectating the lobby of " + lobby.getOwner().getName() + ".");
                         player.teleport(lobby.getOwner());
@@ -429,10 +418,6 @@ public class MiniGameCommand implements CommandExecutor {
             case "unspectate":
                 if (args.length > 1) {
                     player.sendMessage("§cToo many Args! Usage: /mg unspectate");
-                    return true;
-                }
-                if (!player.hasPermission("mgcore.spectate")) {
-                    player.sendMessage("§cYou have no permissions to use this Command!");
                     return true;
                 }
                 if (LobbyManager.getLobbyByPlayer(player) != null) {
@@ -480,26 +465,18 @@ public class MiniGameCommand implements CommandExecutor {
                 break;
 
             case "reload":
-                if (!player.hasPermission("mgcore.admin")) {
-                    player.sendMessage("§cYou have no permissions to use this Command!");
-                    return true;
-                }
                 plugin.reloadConfig();
                 Stats.setup();
                 player.sendMessage("§8[§6MiniGameCore§8] §aPlugin reloaded!");
                 break;
 
             case "stopall":
-                if (!player.hasPermission("mgcore.admin")) {
-                    player.sendMessage("§cYou have no permissions to use this Command!");
-                    return true;
-                }
-                if (lobbyManager.getOpenLobbies() == null) {
+                if (LobbyManager.getOpenLobbies() == null) {
                     player.sendMessage("§8[§6MiniGameCore§8] §cNo active Lobbies.");
                     return true;
                 }
                 player.sendMessage("§8[§6MiniGameCore§8] §cStopping all games!");
-                for (Lobby lobby1 : LobbyManager.getInstance().getOpenLobbies()) {
+                for (Lobby lobby1 : LobbyManager.getOpenLobbies()) {
                     for (Player gamer : lobby1.getPlayers()) {
                         gamer.sendMessage("§8[§6MiniGameCore§8]§c Administrator stopped the game! Resetting...");
                         PlayerHandler.PlayerReset(gamer);
@@ -510,20 +487,16 @@ public class MiniGameCommand implements CommandExecutor {
                 break;
 
             case "stop":
-                if (!player.hasPermission("mgcore.admin")) {
-                    player.sendMessage("§cNo permission!");
-                    return true;
-                }
                 if (args.length < 2) {
                     player.sendMessage("§cMissing Args! Usage: /mg stop <game>");
                     return true;
                 }
-                if (lobbyManager.getLobby(args[1]) == null) {
+                if (LobbyManager.getLobby(args[1]) == null) {
                     player.sendMessage("§8[§6MiniGameCore§8] §cNo active Lobbies.");
                     return true;
                 }
                 player.sendMessage("§8[§6MiniGameCore§8] §cStopping game: " + args[1]);
-                lobby = lobbyManager.getLobby(args[1]);
+                lobby = LobbyManager.getLobby(args[1]);
                 for (Player gamer : lobby.getPlayers()) {
                     gamer.sendMessage("§8[§6MiniGameCore§8]§c Administrator stopped the game! Resetting...");
                     PlayerHandler.PlayerReset(gamer);
@@ -533,10 +506,6 @@ public class MiniGameCommand implements CommandExecutor {
                 break;
 
             case "ban":
-                if (!player.hasPermission("mgcore.admin")) {
-                    player.sendMessage("§cYou don't have permissions to use this Command!");
-                    return true;
-                }
                 if (args.length < 2) {
                     player.sendMessage("§cMissing Args! Usage: /mg ban <player>");
                     return true;
@@ -554,10 +523,6 @@ public class MiniGameCommand implements CommandExecutor {
                 break;
 
             case "unban":
-                if (!player.hasPermission("mgcore.admin")) {
-                    player.sendMessage("§cYou don't have permissions to use this Command!");
-                    return true;
-                }
                 if (args.length < 2) {
                     player.sendMessage("§cMissing Args! Usage: /mg unban <player>");
                     return true;
@@ -569,15 +534,7 @@ public class MiniGameCommand implements CommandExecutor {
                 break;
 
             case "version":
-                if (!player.hasPermission("mgcore.use")) {
-                    player.sendMessage("§cYou don't have permissions to use this Command!");
-                    return true;
-                }
                 player.sendMessage("§8[§6MiniGameCore§8] §aVersion: " + plugin.getDescription().getVersion());
-                break;
-
-            default:
-                player.sendMessage("§8[§6MiniGameCore§8] §cUnknown subcommand!");
                 break;
         }
 
