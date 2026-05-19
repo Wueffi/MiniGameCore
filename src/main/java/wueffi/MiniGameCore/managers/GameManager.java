@@ -52,10 +52,15 @@ public final class GameManager implements Listener {
         int minPlayers = loadGameConfigFromWorld(lobby.getWorldFolder()).getMinPlayers();
 
         if (lobby.getPlayers().size() < minPlayers) {
-            for (Player player : lobby.getPlayers()) {
-                player.sendMessage("§8[§6MiniGameCore§8]§c Not enough players to start Game! (required: " + minPlayers + ")");
+                lobby.getOwner().sendMessage("§8[§6MiniGameCore§8]§c Not enough players to start Game! (required: " + minPlayers + ")");
                 return;
-            }
+        }
+
+        for (Player player : lobby.getPlayers()) {
+            player.sendMessage("§8[§6MiniGameCore§8]§a " + lobby.getGameName() + " is starting!");
+            lastHit.remove(player.getUniqueId()); // just to make sure
+            frozenPlayers.add(player);
+            PlayerSoftReset(player);
         }
 
         GameStartEvent gameStartEvent = new GameStartEvent(lobby.getGameName(), lobby);
@@ -68,12 +73,6 @@ public final class GameManager implements Listener {
             return;
         }
 
-        for (Player player : lobby.getPlayers()) {
-            player.sendMessage("§8[§6MiniGameCore§8]§a " + lobby.getGameName() + " is starting!");
-            lastHit.remove(player.getUniqueId()); // just to make sure
-            frozenPlayers.add(player);
-            PlayerSoftReset(player);
-        }
 
         alivePlayers.put(lobby, new ArrayList<>(lobby.getPlayers()));
         startCountdown(lobby);
