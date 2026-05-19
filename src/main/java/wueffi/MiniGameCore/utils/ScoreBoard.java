@@ -40,7 +40,7 @@ public final class ScoreBoard {
 
         obj.getScore("§r§f").setScore(2);
         obj.getScore("§7─────────────────").setScore(1);
-        obj.getScore("§7Made with ❤ by Waffle").setScore(0);
+        obj.getScore("§7Made with ❤ by Waffle & others").setScore(0);
 
         player.setScoreboard(board);
     }
@@ -89,7 +89,7 @@ public final class ScoreBoard {
 
         obj.getScore("§r§f").setScore(2);
         obj.getScore("§7─────────────────").setScore(1);
-        obj.getScore("§7Made with ❤ by Waffle").setScore(0);
+        obj.getScore("§7Made with ❤ by Waffle & others").setScore(0);
 
         player.setScoreboard(board);
     }
@@ -124,7 +124,7 @@ public final class ScoreBoard {
 
         obj.getScore("§r§f").setScore(2);
         obj.getScore("§7─────────────────").setScore(1);
-        obj.getScore("§7Made with ❤ by Waffle").setScore(0);
+        obj.getScore("§7Made with ❤ by Waffle & others").setScore(0);
 
         player.setScoreboard(board);
     }
@@ -194,7 +194,7 @@ public final class ScoreBoard {
 
         obj.getScore("§r§f").setScore(2);
         obj.getScore("§7─────────────────").setScore(1);
-        obj.getScore("§7Made with ❤ by Waffle").setScore(0);
+        obj.getScore("§7Made with ❤ by Waffle & others").setScore(0);
 
         player.setScoreboard(board);
     }

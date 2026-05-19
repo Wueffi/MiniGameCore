@@ -13,8 +13,8 @@ import wueffi.MiniGameCore.managers.LobbyManager;
 import wueffi.MiniGameCore.managers.PartyManager;
 
 public final class PlayerHandler implements Listener {
-
     private static Plugin plugin;
+    private static final PartyManager partyManager = PartyManager.getInstance();
 
     public PlayerHandler(Plugin plugin2) {
         plugin = plugin2;
@@ -55,7 +55,7 @@ public final class PlayerHandler implements Listener {
                 for (Player partyplayer : party.getPlayers()) {
                     partyplayer.sendMessage("§8[§6MiniGameCore§8]§c Owner of the party left... resetting");
                 }
-                PartyManager.removeParty(party.getPartyId());
+                partyManager.removeParty(party.getPartyId());
             } else {
                 party.removePlayer(player);
             }

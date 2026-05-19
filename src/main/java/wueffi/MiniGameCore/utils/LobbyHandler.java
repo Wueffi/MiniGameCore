@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import wueffi.MiniGameCore.MiniGameCore;
+import wueffi.MiniGameCore.managers.LobbyManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,10 +12,10 @@ import java.util.Objects;
 
 import static java.nio.file.Files.move;
 import static org.bukkit.Bukkit.getLogger;
-import static wueffi.MiniGameCore.managers.LobbyManager.removeLobby;
 
 public final class LobbyHandler {
     private static MiniGameCore plugin;
+    private static LobbyManager lobbyManager = LobbyManager.getInstance();
 
     public static void LobbyReset(Lobby lobby) {
         if (lobby == null) {
@@ -22,7 +23,7 @@ public final class LobbyHandler {
             return;
         }
         deleteWorldFolder(lobby);
-        removeLobby(lobby.getLobbyId());
+        lobbyManager.removeLobby(lobby.getLobbyId());
     }
 
     private static void deleteWorldFolder(Lobby lobby) {

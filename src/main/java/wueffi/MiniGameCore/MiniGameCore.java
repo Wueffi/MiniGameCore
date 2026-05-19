@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 
 public final class MiniGameCore extends JavaPlugin {
     private final MiniGameCore plugin = this;
+    private static final LobbyManager lobbyManager = LobbyManager.getInstance();
     private List<String> availableGames;
     private List<UUID> bannedPlayers;
     private Boolean keepWorlds;
@@ -47,14 +48,18 @@ public final class MiniGameCore extends JavaPlugin {
         Stats.setup();
         getLogger().info("Stats loaded!");
 
+        PartyCommand partyCommand = new PartyCommand(this);
+        PartyTabCompleter partyTabCompleter = new PartyTabCompleter(this);
+        TeamChatCommand teamChatCommand = new TeamChatCommand();
+
         getCommand("mg").setExecutor(new MiniGameCommand(this));
         getCommand("mg").setTabCompleter(new MiniGameTabCompleter(this));
-        getCommand("party").setExecutor(new PartyCommand(this));
-        getCommand("party").setTabCompleter(new PartyTabCompleter(this));
-        getCommand("p").setExecutor(new PartyCommand(this));
-        getCommand("p").setTabCompleter(new PartyTabCompleter(this));
-        getCommand("teamchat").setExecutor(new TeamChatCommand());
-        getCommand("tc").setExecutor(new TeamChatCommand());
+        getCommand("party").setExecutor(partyCommand);
+        getCommand("party").setTabCompleter(partyTabCompleter);
+        getCommand("p").setExecutor(partyCommand);
+        getCommand("p").setTabCompleter(partyTabCompleter);
+        getCommand("teamchat").setExecutor(teamChatCommand);
+        getCommand("tc").setExecutor(teamChatCommand);
         getLogger().info("Commands registered!");
 
         getLogger().info("Starting cleanup task...");
@@ -71,7 +76,7 @@ public final class MiniGameCore extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        for (Lobby lobby : Stream.concat(LobbyManager.getOpenLobbies().stream(), LobbyManager.getClosedLobbies().stream()).toList()) {
+        for (Lobby lobby : Stream.concat(lobbyManager.getOpenLobbies().stream(), lobbyManager.getClosedLobbies().stream()).toList()) {
             String lobbyid = lobby.getLobbyId();
             for (Player player : lobby.getPlayers()) {
                 PlayerHandler.PlayerReset(player);

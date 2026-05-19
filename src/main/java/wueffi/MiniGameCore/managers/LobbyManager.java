@@ -10,10 +10,15 @@ import java.util.*;
 
 public final class LobbyManager {
     private static final Map<String, Lobby> lobbies = new HashMap<>();
+    private static final LobbyManager instance = new LobbyManager();
 
     private LobbyManager() {
     }
 
+    public static LobbyManager getInstance() {
+        return instance;
+    }
+    
     public static Lobby getLobbyByPlayer(Player player) {
         return lobbies.values().stream()
                 .filter(lobby -> lobby.containsPlayer(player))
@@ -21,11 +26,11 @@ public final class LobbyManager {
                 .orElse(null);
     }
 
-    public static boolean removeLobby(String lobbyId) {
+    public boolean removeLobby(String lobbyId) {
         return lobbies.remove(lobbyId) != null;
     }
 
-    public static Lobby createLobby(String gameName, int maxPlayers, Player owner, File newWorldFolder) {
+    public Lobby createLobby(String gameName, int maxPlayers, Player owner, File newWorldFolder) {
         Set<Integer> used = new HashSet<>();
         String prefix = gameName + "-";
         for (String key : lobbies.keySet()) {
@@ -48,17 +53,17 @@ public final class LobbyManager {
         return lobby;
     }
 
-    public static Lobby getLobby(String lobbyId) {
+    public Lobby getLobby(String lobbyId) {
         return lobbies.get(lobbyId);
     }
 
-    public static List<Lobby> getOpenLobbies() {
+    public List<Lobby> getOpenLobbies() {
         return lobbies.values().stream()
                 .filter(lobby -> Objects.equals(lobby.getLobbyState(), "WAITING"))
                 .toList();
     }
 
-    public static List<Lobby> getClosedLobbies() {
+    public List<Lobby> getClosedLobbies() {
         return lobbies.values().stream()
                 .filter(lobby -> Objects.equals(lobby.getLobbyState(), "GAME"))
                 .toList();
@@ -69,7 +74,7 @@ public final class LobbyManager {
             for (Lobby lobby : new ArrayList<>(LobbyManager.lobbies.values())) {
                 Player owner = lobby.getOwner();
                 if (owner == null || !owner.isOnline()) {
-                    LobbyManager.removeLobby(lobby.getLobbyId());
+                    instance.removeLobby(lobby.getLobbyId());
                 }
             }
         }, 0L, 400L);

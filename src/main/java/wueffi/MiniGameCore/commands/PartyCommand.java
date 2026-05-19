@@ -18,6 +18,8 @@ import java.util.HashMap;
 public final class PartyCommand implements CommandExecutor {
     private final MiniGameCore plugin;
     private static final HashMap<String, String> commandsPermissions = new HashMap<>();
+    private static final PartyManager partyManager = PartyManager.getInstance();
+
     public PartyCommand(MiniGameCore plugin) {
         this.plugin = plugin;
     }
@@ -80,7 +82,7 @@ public final class PartyCommand implements CommandExecutor {
                     return true;
                 }
                 String partyName = args[1];
-                party = PartyManager.createParty(partyName, player);
+                party = partyManager.createParty(partyName, player);
                 player.sendMessage("§8[§6MiniGameCore§8]§a You created the party: " + party.getPartyName());
                 break;
             case "leave":
@@ -101,7 +103,7 @@ public final class PartyCommand implements CommandExecutor {
                     player.sendMessage("§8[§6MiniGameCore§8]§a You were the last player, deleting party...");
                     if (party.removePlayer(player)) {
                         player.sendMessage("§8[§6MiniGameCore§8]§a You left the party: " + party.getPartyName());
-                        if (!PartyManager.removeParty(party.getPartyId())) player.sendMessage("§8[§6MiniGameCore§8]§c Could not remove party: " + party.getPartyName());
+                        if (!partyManager.removeParty(party.getPartyId())) player.sendMessage("§8[§6MiniGameCore§8]§c Could not remove party: " + party.getPartyName());
                     } else {
                         player.sendMessage("§8[§6MiniGameCore§8]§c Could not leave party: " + party.getPartyName());
                     }
@@ -114,7 +116,7 @@ public final class PartyCommand implements CommandExecutor {
                         for (Player player1 : party.getPlayers()) {
                             player1.sendMessage("§8[§6MiniGameCore§8]§a Owner §7 " + player.getName() + "§a has left the party!");
                         }
-                        if (!PartyManager.removeParty(party.getPartyId())) player.sendMessage("§8[§6MiniGameCore§8]§c Could not remove party: " + party.getPartyName());
+                        if (!partyManager.removeParty(party.getPartyId())) player.sendMessage("§8[§6MiniGameCore§8]§c Could not remove party: " + party.getPartyName());
                     } else {
                         player.sendMessage("§8[§6MiniGameCore§8]§c Could not leave party: " + party.getPartyName());
                     }

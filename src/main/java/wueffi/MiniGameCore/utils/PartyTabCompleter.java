@@ -49,8 +49,9 @@ public final class PartyTabCompleter implements TabCompleter {
             } // well that was easy
         }
 
+        String lastTyped = args[args.length - 1].toLowerCase();
         return completions.stream()
-                .filter(s -> s.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
+                .filter(s -> s.toLowerCase().startsWith(lastTyped))
                 .toList();
     }
 }

@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 public final class MiniGameTabCompleter implements TabCompleter {
     private final MiniGameCore plugin;
+    private static final LobbyManager lobbyManager = LobbyManager.getInstance();
     private static final Map<String, String> commandsPermissions = MiniGameCommand.getCommandsPermissions();
 
     public MiniGameTabCompleter(MiniGameCore plugin) {
@@ -52,7 +53,7 @@ public final class MiniGameTabCompleter implements TabCompleter {
                     break;
                 case "join":
                     if (!plugin.getBannedPlayers().contains(player.getUniqueId())) {
-                        completions = LobbyManager.getOpenLobbies().stream()
+                        completions = lobbyManager.getOpenLobbies().stream()
                                 .filter(l -> player.hasPermission(GameManager.getConfig(l).getJoinPerm()))
                                 .map(Lobby::getLobbyId)
                                 .toList();
@@ -60,7 +61,7 @@ public final class MiniGameTabCompleter implements TabCompleter {
                     break;
                 case "spectate":
                     completions = Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
-                    for (Lobby lobby : LobbyManager.getOpenLobbies()) {
+                    for (Lobby lobby : lobbyManager.getOpenLobbies()) {
                         String lobbyId = lobby.getLobbyId();
                         completions.add(lobbyId);
                     }
@@ -72,7 +73,7 @@ public final class MiniGameTabCompleter implements TabCompleter {
                     break;
                 case "stop":
                     completions = new ArrayList<>();
-                    for (Lobby lobby : LobbyManager.getOpenLobbies()) {
+                    for (Lobby lobby : lobbyManager.getOpenLobbies()) {
                         String lobbyId = lobby.getLobbyId();
                         completions.add(lobbyId);
                     }
@@ -80,8 +81,9 @@ public final class MiniGameTabCompleter implements TabCompleter {
             }
         }
 
+        String lastTyped = args[args.length - 1].toLowerCase();
         return completions.stream()
-                .filter(s -> s.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
-                .collect(Collectors.toList());
+                .filter(s -> s.toLowerCase().startsWith(lastTyped))
+                .toList();
     }
 }

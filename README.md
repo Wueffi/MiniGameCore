@@ -163,6 +163,7 @@ In your project, import classes/events/methods using `import wueffi.MiniGameCore
 [Team](https://github.com/Wueffi/MiniGameCore/blob/master/src/main/java/wueffi/MiniGameCore/utils/Team.java)
 
 **Available API methods are:** \
+`getLobbyManager()` -> return the LobbyManager instance \
 `winPlayer(Lobby lobby, Player player)` -> let a singular Player win a game \
 `winTeam(Lobby lobby, Team team)` -> let a Team win a game \
 `playerDeath(UUID playerid)` -> notify MiniGameCore of a Players Death \

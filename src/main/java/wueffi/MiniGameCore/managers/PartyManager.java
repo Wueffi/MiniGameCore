@@ -7,10 +7,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class PartyManager {
+    private static final PartyManager instance = new PartyManager();
     private static final Map<String, Party> parties = new HashMap<>();
     private static final Map<String, Integer> partyCounter = new HashMap<>();
 
     private PartyManager() {
+    }
+
+    public static PartyManager getInstance() {
+        return instance;
     }
 
     public static Party getPartyByPlayer(Player player) {
@@ -20,14 +25,14 @@ public final class PartyManager {
                 .orElse(null);
     }
 
-    public static boolean removeParty(String partyId) {
+    public boolean removeParty(String partyId) {
         Party party = parties.remove(partyId);
         if (party == null) return false;
         partyCounter.remove(party.getPartyName());
         return true;
     }
 
-    public static Party createParty(String partyName, Player owner) {
+    public Party createParty(String partyName, Player owner) {
         int id = partyCounter.getOrDefault(partyName, 0) + 1;
         partyCounter.put(partyName, id);
 

@@ -23,6 +23,7 @@ public final class MiniGameCommand implements CommandExecutor {
     private final MiniGameCore plugin;
     private static final Map<Player, Lobby> confirmations = new HashMap<>();
     private static final HashMap<String, String> commandsPermissions = new HashMap<>();
+    private static final LobbyManager lobbyManager = LobbyManager.getInstance();
 
     public MiniGameCommand(MiniGameCore plugin) {
         this.plugin = plugin;
@@ -120,7 +121,7 @@ public final class MiniGameCommand implements CommandExecutor {
                             player.sendMessage("§8[§6MiniGameCore§8]§c Party too big for game!");
                             return true;
                         }
-                        lobby = GameManager.hostGame(gameName, sender);
+                        lobby = GameManager.hostGame(gameName, player);
                         if (lobby == null) {
                             return true; // the game manager already sent the message for us
                         }
@@ -154,7 +155,7 @@ public final class MiniGameCommand implements CommandExecutor {
                         return true;
                     }
                 } else {
-                    lobby = GameManager.hostGame(gameName, sender); // again, it handled the message for us
+                    lobby = GameManager.hostGame(gameName, player); // again, it handled the message for us
                 }
                 player.sendMessage("§8[§6MiniGameCore§8]§a Hosting game: " + args[1]);
                 ScoreBoardManager.setPlayerStatus(player, "WAITING");
@@ -173,7 +174,7 @@ public final class MiniGameCommand implements CommandExecutor {
                 }
 
                 String lobbyName = args[1];
-                lobby = LobbyManager.getLobby(lobbyName);
+                lobby = lobbyManager.getLobby(lobbyName);
 
                 if (lobby == null) {
                     player.sendMessage("§8[§6MiniGameCore§8] §cLobby not found!");
@@ -404,7 +405,7 @@ public final class MiniGameCommand implements CommandExecutor {
                     player.teleport(targetPlayer);
                     player.setGameMode(GameMode.SPECTATOR);
                 } else {
-                    lobby = LobbyManager.getLobby(target);
+                    lobby = lobbyManager.getLobby(target);
                     if (lobby != null) {
                         player.sendMessage("§8[§6MiniGameCore§8] §aYou are now spectating the lobby of " + lobby.getOwner().getName() + ".");
                         player.teleport(lobby.getOwner());
@@ -471,12 +472,12 @@ public final class MiniGameCommand implements CommandExecutor {
                 break;
 
             case "stopall":
-                if (LobbyManager.getOpenLobbies() == null) {
+                if (lobbyManager.getOpenLobbies() == null) {
                     player.sendMessage("§8[§6MiniGameCore§8] §cNo active Lobbies.");
                     return true;
                 }
                 player.sendMessage("§8[§6MiniGameCore§8] §cStopping all games!");
-                for (Lobby lobby1 : LobbyManager.getOpenLobbies()) {
+                for (Lobby lobby1 : lobbyManager.getOpenLobbies()) {
                     for (Player gamer : lobby1.getPlayers()) {
                         gamer.sendMessage("§8[§6MiniGameCore§8]§c Administrator stopped the game! Resetting...");
                         PlayerHandler.PlayerReset(gamer);
@@ -491,12 +492,12 @@ public final class MiniGameCommand implements CommandExecutor {
                     player.sendMessage("§cMissing Args! Usage: /mg stop <game>");
                     return true;
                 }
-                if (LobbyManager.getLobby(args[1]) == null) {
+                if (lobbyManager.getLobby(args[1]) == null) {
                     player.sendMessage("§8[§6MiniGameCore§8] §cNo active Lobbies.");
                     return true;
                 }
                 player.sendMessage("§8[§6MiniGameCore§8] §cStopping game: " + args[1]);
-                lobby = LobbyManager.getLobby(args[1]);
+                lobby = lobbyManager.getLobby(args[1]);
                 for (Player gamer : lobby.getPlayers()) {
                     gamer.sendMessage("§8[§6MiniGameCore§8]§c Administrator stopped the game! Resetting...");
                     PlayerHandler.PlayerReset(gamer);

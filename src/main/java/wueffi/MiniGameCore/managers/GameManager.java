@@ -1,7 +1,6 @@
 package wueffi.MiniGameCore.managers;
 
 import org.bukkit.*;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -35,10 +34,11 @@ import static wueffi.MiniGameCore.utils.PlayerHandler.PlayerSoftReset;
 public final class GameManager implements Listener {
     static final Map<Lobby, List<Player>> alivePlayers = new HashMap<>();
     private static final Set<Player> frozenPlayers = new HashSet<>();
-    static Map<UUID, Location> playerRespawnPoints = new HashMap<>();
+    private static final Map<UUID, Location> playerRespawnPoints = new HashMap<>();
     private static MiniGameCore plugin;
     private static final Map<UUID, UUID> lastHit = new HashMap<>();
     private static final Map<Lobby, GameConfig> configCache = new HashMap<>();
+    private static final LobbyManager lobbyManager = LobbyManager.getInstance();
 
     public GameManager(MiniGameCore plugin) {
         GameManager.plugin = plugin;
@@ -58,14 +58,24 @@ public final class GameManager implements Listener {
             }
         }
 
+        GameStartEvent gameStartEvent = new GameStartEvent(lobby.getGameName(), lobby);
+        Bukkit.getPluginManager().callEvent(gameStartEvent);
+
+        if (gameStartEvent.isCancelled()) {
+            for (Player player : lobby.getPlayers()) {
+                player.sendMessage("§8[§6MiniGameCore§8]§c Game start was cancelled!");
+            }
+            return;
+        }
+
         for (Player player : lobby.getPlayers()) {
             player.sendMessage("§8[§6MiniGameCore§8]§a " + lobby.getGameName() + " is starting!");
             lastHit.remove(player.getUniqueId()); // just to make sure
             frozenPlayers.add(player);
             PlayerSoftReset(player);
         }
+
         alivePlayers.put(lobby, new ArrayList<>(lobby.getPlayers()));
-        Bukkit.getPluginManager().callEvent(new GameStartEvent(lobby.getGameName(), lobby));
         startCountdown(lobby);
     }
 
@@ -79,9 +89,7 @@ public final class GameManager implements Listener {
                 playerRespawnPoints.remove(player.getUniqueId());
                 runDelayed(() -> PlayerHandler.PlayerReset(player), 4);
             }
-        }
-
-        if (winner instanceof Winner.TeamWinner(Team winnerTeam)) {
+        } else if (winner instanceof Winner.TeamWinner(Team winnerTeam)) {
             for (Team team : lobby.getTeamList()) {
                 if (team.equals(winnerTeam)) {
                     for (Player teamPlayer : team.getPlayers()) {
@@ -104,7 +112,6 @@ public final class GameManager implements Listener {
                 }
             }
         } else if (winner instanceof Winner.PlayerWinner(Player winnerPlayer)) {
-
             for (Player player : lobby.getPlayers()) {
                 if (player.equals(winnerPlayer)) {
                     Stats.win(lobby.getGameName(), player);
@@ -131,7 +138,7 @@ public final class GameManager implements Listener {
         List<Player> players = new ArrayList<>(lobby.getPlayers());
         Integer timeLimit = gameConfig.getTimeLimit();
 
-        Collections.shuffle(players); // Shuffly Shuff
+        Collections.shuffle(players);
 
         if (gameConfig.getTeams() > 0) {
             int teamCount = gameConfig.getTeams();
@@ -220,8 +227,8 @@ public final class GameManager implements Listener {
         if (configFile.exists()) {
             return new GameConfig(configFile);
         } else {
-            plugin.getLogger().warning("No config.yml found in world folder for " + worldFolder.getName());
-            return new GameConfig(configFile);
+            plugin.getLogger().warning("No config.yml found in world folder for " + worldFolder.getName() + ", this may cause NPEs.");
+            return null;
         }
     }
 
@@ -229,9 +236,7 @@ public final class GameManager implements Listener {
         Bukkit.getScheduler().runTaskLater(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("MiniGameCore")), task, seconds * 20L);
     }
 
-    public static Lobby hostGame(String gameName, CommandSender sender) {
-        Player player = (Player) sender;
-
+    public static Lobby hostGame(String gameName, Player player) {
         String originalWorldName = gameName + "_world";
         String newWorldName = gameName + "_copy_" + System.currentTimeMillis();
 
@@ -278,7 +283,7 @@ public final class GameManager implements Listener {
         GameConfig gameConfig = loadGameConfigFromWorld(newWorldFolder);
         int maxPlayers = gameConfig.getMaxPlayers();
 
-        Lobby lobby = LobbyManager.createLobby(gameName, maxPlayers, player, newWorldFolder);
+        Lobby lobby = lobbyManager.createLobby(gameName, maxPlayers, player, newWorldFolder);
 
         if (lobby == null) {
             player.sendMessage("§8[§6MiniGameCore§8]§c Lobby could not be created!");
@@ -296,7 +301,7 @@ public final class GameManager implements Listener {
     }
 
     public static void timeLimitGame(Lobby lobby) {
-        if (LobbyManager.getClosedLobbies().contains(lobby) || LobbyManager.getOpenLobbies().contains(lobby)) {
+        if (lobbyManager.getClosedLobbies().contains(lobby) || lobbyManager.getOpenLobbies().contains(lobby)) {
             List<Player> alive = alivePlayers.get(lobby);
             GameManager.endGame(lobby, new Winner.TieWinner(alive));
         }
@@ -626,7 +631,7 @@ public final class GameManager implements Listener {
 
     @EventHandler
     public void onPlayerCraft(CraftItemEvent event) {
-        Player player = (Player) event.getWhoClicked();
+        if (!(event.getWhoClicked() instanceof Player player)) return;
         Lobby lobby = LobbyManager.getLobbyByPlayer(player);
 
         if (lobby == null) return;
