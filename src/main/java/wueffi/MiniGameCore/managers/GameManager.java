@@ -79,9 +79,9 @@ public final class GameManager implements Listener {
     }
 
     public static void endGame(Lobby lobby, Winner winner) {
-        if (winner instanceof Winner.TieWinner(List<Player> playerList)) {
+        if (winner instanceof Winner.TieWinner(Collection<Player> players)) {
             for (Player player : lobby.getPlayers()) {
-                if (playerList.contains(player))  Stats.tie(lobby.getGameName(), player);
+                if (players.contains(player))  Stats.tie(lobby.getGameName(), player);
                 else Stats.lose(lobby.getGameName(), player);
                 player.sendTitle("§6The Game", "was tied!", 10, 70, 20);
                 lastHit.remove(player.getUniqueId());
@@ -366,6 +366,10 @@ public final class GameManager implements Listener {
 
     public static void clearFrozenPlayers() {
         frozenPlayers.clear();
+    }
+
+    public static Collection<Player> getAlivePlayersByLobby(Lobby lobby) {
+        return alivePlayers.get(lobby);
     }
 
     @EventHandler

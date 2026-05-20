@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static wueffi.MiniGameCore.managers.GameManager.alivePlayers;
 
 public final class ScoreBoardManager implements Listener {
     private static final LobbyManager lobbyManager = LobbyManager.getInstance();
@@ -61,7 +60,7 @@ public final class ScoreBoardManager implements Listener {
                     if (config.getTeams() > 0) {
                         ScoreBoard.createTeamGameBoard(player);
                     } else {
-                        ScoreBoard.createGameBoard(player, new ArrayList<>(alivePlayers.get(gameLobby)));
+                        ScoreBoard.createGameBoard(player, new ArrayList<>(GameManager.getAlivePlayersByLobby(gameLobby)));
                     }
                 }
                 break;

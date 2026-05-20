@@ -358,7 +358,7 @@ public final class MiniGameCommand implements CommandExecutor {
                             gamer.sendMessage("§8[§6MiniGameCore§8]§c Lobby Owner " + player.getName() + " left the Lobby! Resetting...");
                             PlayerHandler.PlayerReset(gamer);
                         }
-                        LobbyHandler.LobbyReset(lobby);
+                        GameManager.endGame(lobby, new Winner.TieWinner(GameManager.getAlivePlayersByLobby(lobby)));
                     }
                     ScoreBoardManager.setPlayerStatus(player, "NONE");
                 } else {
