@@ -124,6 +124,14 @@ public final class GameManager implements Listener {
                 playerRespawnPoints.remove(player.getUniqueId());
                 runDelayed(() -> PlayerHandler.PlayerReset(player), 4);
             }
+        } else {
+            for (Player player : lobby.getPlayers()) {
+                player.sendTitle("§6The Game", "was aborted.", 10, 70, 20);
+                player.playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1.0f, 1.0f);
+                lastHit.remove(player.getUniqueId());
+                playerRespawnPoints.remove(player.getUniqueId());
+                runDelayed(() -> PlayerHandler.PlayerReset(player), 4);
+            }
         }
 
         configCache.remove(lobby);

@@ -480,9 +480,8 @@ public final class MiniGameCommand implements CommandExecutor {
                 for (Lobby lobby1 : lobbyManager.getOpenLobbies()) {
                     for (Player gamer : lobby1.getPlayers()) {
                         gamer.sendMessage("§8[§6MiniGameCore§8]§c Administrator stopped the game! Resetting...");
-                        PlayerHandler.PlayerReset(gamer);
-                        LobbyHandler.LobbyReset(lobby1);
                     }
+                    GameManager.endGame(lobby1, new Winner.Aborted());
                 }
                 player.sendMessage("§8[§6MiniGameCore§8] §cStopped all games.");
                 break;
@@ -492,17 +491,18 @@ public final class MiniGameCommand implements CommandExecutor {
                     player.sendMessage("§cMissing Args! Usage: /mg stop <game>");
                     return true;
                 }
-                if (lobbyManager.getLobby(args[1]) == null) {
+                lobby = lobbyManager.getLobby(args[1]);
+
+                if (lobby == null) {
                     player.sendMessage("§8[§6MiniGameCore§8] §cNo active Lobbies.");
                     return true;
                 }
                 player.sendMessage("§8[§6MiniGameCore§8] §cStopping game: " + args[1]);
-                lobby = lobbyManager.getLobby(args[1]);
+
                 for (Player gamer : lobby.getPlayers()) {
                     gamer.sendMessage("§8[§6MiniGameCore§8]§c Administrator stopped the game! Resetting...");
-                    PlayerHandler.PlayerReset(gamer);
-                    LobbyHandler.LobbyReset(lobby);
                 }
+                GameManager.endGame(lobby, new Winner.Aborted());
                 player.sendMessage("§8[§6MiniGameCore§8] §cStopped game: " + args[1]);
                 break;
 
