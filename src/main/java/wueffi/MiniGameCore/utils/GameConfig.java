@@ -32,6 +32,7 @@ public class GameConfig {
     private final boolean allowCrafting;
     private final boolean silenceDeathMessages;
     private final boolean allowOpeningContainers;
+    private final boolean doHunger;
 
     public GameConfig(File configFile) {
         FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
@@ -50,6 +51,7 @@ public class GameConfig {
         this.allowCrafting = config.getBoolean("game.allowCrafting", false);
         this.silenceDeathMessages = config.getBoolean("game.silenceDeathMessages", false);
         this.allowOpeningContainers = config.getBoolean("game.allowOpeningContainers", false);
+        this.doHunger = config.getBoolean("game.doHunger", false);
 
         if (config.contains("game.spawnPoints")) {
             for (String key : config.getConfigurationSection("game.spawnPoints").getKeys(false)) {
@@ -183,6 +185,10 @@ public class GameConfig {
     }
 
     public boolean getAllowOpeningContainers() { return allowOpeningContainers; }
+
+    public boolean getDoHunger() {
+        return doHunger;
+    }
 
     public record SpawnPoint(int x, int y, int z) {
     }

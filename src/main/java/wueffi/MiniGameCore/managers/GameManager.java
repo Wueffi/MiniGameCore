@@ -72,53 +72,63 @@ public class GameManager implements Listener {
     }
 
     public static void endGame(Lobby lobby, Winner winner) {
-        if (winner instanceof Winner.TieWinner(List<Player> playerList)) {
-            for (Player player : lobby.getPlayers()) {
-                if (playerList.contains(player))  Stats.tie(lobby.getGameName(), player);
-                else Stats.lose(lobby.getGameName(), player);
-                showTitle(player, "§6The Game", "was tied!", 10, 70, 20);
-                lastHit.remove(player.getUniqueId());
-                playerRespawnPoints.remove(player.getUniqueId());
-                runDelayed(() -> PlayerHandler.PlayerReset(player), 4);
+        switch (winner) {
+            case Winner.TieWinner(Collection<Player> players) -> {
+                for (Player player : lobby.getPlayers()) {
+                    if (players.contains(player)) Stats.tie(lobby.getGameName(), player);
+                    else Stats.lose(lobby.getGameName(), player);
+                    showTitle(player, "§6The Game", "was tied!", 10, 70, 20);
+                    lastHit.remove(player.getUniqueId());
+                    playerRespawnPoints.remove(player.getUniqueId());
+                    runDelayed(() -> PlayerHandler.PlayerReset(player), 4);
+                }
             }
-        }
-
-        if (winner instanceof Winner.TeamWinner(Team winnerTeam)) {
-            for (Team team : lobby.getTeamList()) {
-                if (team.equals(winnerTeam)) {
-                    for (Player teamPlayer : team.getPlayers()) {
-                        Stats.win(lobby.getGameName(), teamPlayer);
-                        showTitle(teamPlayer, "§6Your Team", "won the Game!", 10, 70, 20);
-                        teamPlayer.playSound(teamPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
-                        lastHit.remove(teamPlayer.getUniqueId());
-                        playerRespawnPoints.remove(teamPlayer.getUniqueId());
-                        runDelayed(() -> PlayerHandler.PlayerReset(teamPlayer), 4);
-                    }
-                } else {
-                    for (Player teamPlayer : team.getPlayers()) {
-                        Stats.lose(lobby.getGameName(), teamPlayer);
-                        showTitle(teamPlayer, "§6The " + winnerTeam.getColorCode() + winnerTeam.getColor() + " §6Team", "won the Game!", 10, 70, 20);
-                        teamPlayer.playSound(teamPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
-                        lastHit.remove(teamPlayer.getUniqueId());
-                        playerRespawnPoints.remove(teamPlayer.getUniqueId());
-                        runDelayed(() -> PlayerHandler.PlayerReset(teamPlayer), 4);
+            case Winner.TeamWinner(Team winnerTeam) -> {
+                for (Team team : lobby.getTeamList()) {
+                    if (team.equals(winnerTeam)) {
+                        for (Player teamPlayer : team.getPlayers()) {
+                            Stats.win(lobby.getGameName(), teamPlayer);
+                            showTitle(teamPlayer, "§6Your Team", "won the Game!", 10, 70, 20);
+                            teamPlayer.playSound(teamPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+                            lastHit.remove(teamPlayer.getUniqueId());
+                            playerRespawnPoints.remove(teamPlayer.getUniqueId());
+                            runDelayed(() -> PlayerHandler.PlayerReset(teamPlayer), 4);
+                        }
+                    } else {
+                        for (Player teamPlayer : team.getPlayers()) {
+                            Stats.lose(lobby.getGameName(), teamPlayer);
+                            showTitle(teamPlayer, "§6The " + winnerTeam.getColorCode() + winnerTeam.getColor() + " §6Team", "won the Game!", 10, 70, 20);
+                            teamPlayer.playSound(teamPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+                            lastHit.remove(teamPlayer.getUniqueId());
+                            playerRespawnPoints.remove(teamPlayer.getUniqueId());
+                            runDelayed(() -> PlayerHandler.PlayerReset(teamPlayer), 4);
+                        }
                     }
                 }
             }
-        } else if (winner instanceof Winner.PlayerWinner(Player winnerPlayer)) {
+            case Winner.PlayerWinner(Player winnerPlayer) -> {
+                for (Player player : lobby.getPlayers()) {
+                    if (player.equals(winnerPlayer)) {
+                        Stats.win(lobby.getGameName(), player);
+                    } else {
+                        Stats.lose(lobby.getGameName(), player);
+                    }
 
-            for (Player player : lobby.getPlayers()) {
-                if (player.equals(winnerPlayer)) {
-                    Stats.win(lobby.getGameName(), player);
-                } else {
-                    Stats.lose(lobby.getGameName(), player);
+                    showTitle(player, "§6" + winnerPlayer.getName(), "won the Game!", 10, 70, 20);
+                    player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+                    lastHit.remove(player.getUniqueId());
+                    playerRespawnPoints.remove(player.getUniqueId());
+                    runDelayed(() -> PlayerHandler.PlayerReset(player), 4);
                 }
-
-                showTitle(player, "§6" + winnerPlayer.getName(), "won the Game!", 10, 70, 20);
-                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
-                lastHit.remove(player.getUniqueId());
-                playerRespawnPoints.remove(player.getUniqueId());
-                runDelayed(() -> PlayerHandler.PlayerReset(player), 4);
+            }
+            case null, default -> {
+                for (Player player : lobby.getPlayers()) {
+                    showTitle(player, "§6The Game", "was aborted.", 10, 70, 20);
+                    player.playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1.0f, 1.0f);
+                    lastHit.remove(player.getUniqueId());
+                    playerRespawnPoints.remove(player.getUniqueId());
+                    runDelayed(() -> PlayerHandler.PlayerReset(player), 4);
+                }
             }
         }
 
@@ -621,9 +631,15 @@ public class GameManager implements Listener {
         }
         GameConfig config = getConfig(lobby);
 
-        if (lobby.getLobbyState().equals("GAME")) return;
-        if (config.getAllowOpeningContainers()) return;
-        if (event.getInventory().getType().equals(InventoryType.PLAYER)) return;
+        if (lobby.getLobbyState().equals("GAME")) {
+            return;
+        }
+        if (config.getAllowOpeningContainers()) {
+            return;
+        }
+        if (event.getInventory().getType().equals(InventoryType.PLAYER)) {
+            return;
+        }
 
         player.sendMessage("§8[§6MiniGameCore§8]§c You can't open Containers yet!");
         event.setCancelled(true);

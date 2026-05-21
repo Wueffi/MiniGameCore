@@ -88,6 +88,9 @@ All available options:
 | `allowCrafting`         | Allows Players to craft items during the game                     | ❌ No (default: false) |
 | `silenceDeathMessages`  | Whether or not to silence death messages                          | ❌ No (default: false) |
 | `allowOpeningContainers`| Allows players to open containers before the game starts          | ❌ No (default: false) |
+| `hostPerm`              | Only players with this permission may host this game              | ❌ No (default: mgcore.host) |
+| `joinPerm`              | Only players with this permission may join this game              | ❌ No (default: mgcore.join) |   
+| `doHunger`              | Whether players' hunger bars should deplete                       | ❌ No (default: false)       |
 
 Example config for an 8 player Spleef-Game:
 ```
