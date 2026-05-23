@@ -623,7 +623,7 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void catchContainerOpen(InventoryOpenEvent event) {
-        Player player = (Player) event.getPlayer();
+        if (!(event.getPlayer() instanceof Player player)) return;
         Lobby lobby = LobbyManager.getLobbyByPlayer(player);
         if (lobby == null) {
             event.setCancelled(false);
