@@ -45,7 +45,7 @@ public final class PartyCommand implements CommandExecutor {
         Player target;
 
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("Only players can use this command!");
+            sender.sendMessage("This command can only be run by players, trying to run it from the console will fail!");
             return true;
         }
         HashMap<String, String> commandsPermissions = getCommandsPermissions();
@@ -73,7 +73,7 @@ public final class PartyCommand implements CommandExecutor {
                     return true;
                 }
                 if (args.length < 2) {
-                    player.sendMessage("§cMissing Args! Usage: /party create <name>");
+                    player.sendMessage("§cMissing Arguments! Usage: /party create <name>");
                     return true;
                 }
                 if (!player.hasPermission("mgcore.party.create")) {
@@ -90,7 +90,7 @@ public final class PartyCommand implements CommandExecutor {
                 break;
             case "leave":
                 if (args.length != 1) {
-                    player.sendMessage("§cToo many Args! Usage: /party leave");
+                    player.sendMessage("§cToo many Arguments! Usage: /party leave");
                     return true;
                 }
                 if (!player.hasPermission("mgcore.party.join")) {
@@ -140,7 +140,7 @@ public final class PartyCommand implements CommandExecutor {
                     return true;
                 }
                 if (args.length < 2) {
-                    player.sendMessage("§cMissing Args! Usage: /party join <player>");
+                    player.sendMessage("§cMissing Arguments! Usage: /party join <player>");
                     return true;
                 }
                 if (!player.hasPermission("mgcore.party.join")) {
@@ -168,12 +168,12 @@ public final class PartyCommand implements CommandExecutor {
                     }
                     return true;
                 } else {
-                    sendMGCInfo(player, " You were not invited to " + party.getPartyName() + ".");
+                    sendMGCInfo(player, " You were not invited to join the party " + party.getPartyName() + ".");
                 }
                 break;
             case "invite":
                 if (args.length < 2) {
-                    player.sendMessage("§cMissing Args! Usage: /party invite <player>");
+                    player.sendMessage("§cMissing Arguments! Usage: /party invite <player>");
                     return true;
                 }
                 if (!player.hasPermission("mgcore.party.invite")) {
@@ -200,12 +200,12 @@ public final class PartyCommand implements CommandExecutor {
                     target.sendMessage(Component.text("             ").append(accept).append(Component.text("           ")).append(deny));
                     sendMGCInfo(player, "You invited " + args[1] + "!");
                 } else {
-                    sendMGCError(player, "Could not invite " + args[1]);
+                    sendMGCError(player, "Could not invite " + args[1] + "to party.");
                 }
                 break;
             case "deny":
                 if (args.length < 2) {
-                    player.sendMessage("§cMissing Args! Usage: /party deny <player>");
+                    player.sendMessage("§cMissing Arguments! Usage: /party deny <player>");
                     return true;
                 }
                 if (!player.hasPermission("mgcore.party.invite")) {
@@ -235,7 +235,7 @@ public final class PartyCommand implements CommandExecutor {
                 break;
             case "list":
                 if (args.length > 2) {
-                    player.sendMessage("§cMissing Args! Usage: /party list");
+                    player.sendMessage("§cMissing Arguments! Usage: /party list");
                     return true;
                 }
                 if (!player.hasPermission("mgcore.party.list")) {

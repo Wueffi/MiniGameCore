@@ -61,7 +61,7 @@ public final class MiniGameCommand implements CommandExecutor {
         Lobby lobby;
 
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("Yo console User, only players can use this command!");
+            sender.sendMessage("This command can only be run by players, trying to run it from the console will fail!");
             return true;
         }
         HashMap<String, String> commandsPermissions = getCommandsPermissions();
@@ -101,7 +101,7 @@ public final class MiniGameCommand implements CommandExecutor {
                     return true;
                 }
                 if (args.length < 2) {
-                    player.sendMessage("§cMissing Args! Usage: /mg host <game>");
+                    player.sendMessage("§cMissing Arguments! Usage: /mg host <game>");
                     return true;
                 }
                 if (LobbyManager.getLobbyByPlayer(player) != null) {
@@ -174,7 +174,7 @@ public final class MiniGameCommand implements CommandExecutor {
                     return true;
                 }
                 if (args.length < 2) {
-                    player.sendMessage("§cMissing Args! Usage: /mg join <game>");
+                    player.sendMessage("§cMissing Arguments! Usage: /mg join <game>");
                     return true;
                 }
 
@@ -263,7 +263,7 @@ public final class MiniGameCommand implements CommandExecutor {
 
             case "confirm":
                 if (args.length >= 2) {
-                    player.sendMessage("§cToo many Args! Usage: /mg confirm");
+                    player.sendMessage("§cToo many Arguments! Usage: /mg confirm");
                     return true;
                 }
                 if (!confirmations.containsKey(player)) {
@@ -291,12 +291,12 @@ public final class MiniGameCommand implements CommandExecutor {
 
             case "ready":
                 if (args.length >= 2) {
-                player.sendMessage("§cToo many Args! Usage: /mg unready");
+                player.sendMessage("§cToo many Arguments! Usage: /mg unready");
                     return true;
                 }
 
                 if (LobbyManager.getLobbyByPlayer(player) == null) {
-                    sendMGCError(player, "You are in no lobby!");
+                    sendMGCError(player, "You are not in any lobby!");
                     return true;
                 }
 
@@ -308,7 +308,7 @@ public final class MiniGameCommand implements CommandExecutor {
                 }
 
                 if (!lobby.ready(player)) {
-                    sendMGCError(player, "Could not ready!");
+                    sendMGCError(player, "Readying failed!");
                     return true;
                 }
                 sendMGCInfo(player, "You are now ready!");
@@ -316,7 +316,7 @@ public final class MiniGameCommand implements CommandExecutor {
 
             case "unready":
                 if (args.length >= 2) {
-                    player.sendMessage("§cToo many Args! Usage: /mg unready");
+                    player.sendMessage("§cToo many Arguments! Usage: /mg unready");
                     return true;
                 }
 
@@ -333,7 +333,7 @@ public final class MiniGameCommand implements CommandExecutor {
                 }
 
                 if (!lobby.unready(player)) {
-                    sendMGCError(player, "Could not unready!");
+                    sendMGCError(player, "Unreadying failed!");
                     return true;
                 }
                 sendMGCInfo(player, "You not ready anymore!");
@@ -341,7 +341,7 @@ public final class MiniGameCommand implements CommandExecutor {
 
             case "leave":
                 if (args.length >= 2) {
-                    player.sendMessage("§cToo many Args! Usage: /mg leave");
+                    player.sendMessage("§cToo many Arguments! Usage: /mg leave");
                     return true;
                 }
 
@@ -395,7 +395,7 @@ public final class MiniGameCommand implements CommandExecutor {
 
             case "spectate":
                 if (args.length < 2) {
-                    player.sendMessage("§cMissing Args! Usage: /mg spectate <game|player>");
+                    player.sendMessage("§cMissing Arguments! Usage: /mg spectate <game|player>");
                     return true;
                 }
                 if (LobbyManager.getLobbyByPlayer(player) != null) {
@@ -424,7 +424,7 @@ public final class MiniGameCommand implements CommandExecutor {
 
             case "unspectate":
                 if (args.length > 1) {
-                    player.sendMessage("§cToo many Args! Usage: /mg unspectate");
+                    player.sendMessage("§cToo many Arguments! Usage: /mg unspectate");
                     return true;
                 }
                 if (LobbyManager.getLobbyByPlayer(player) != null) {
@@ -494,7 +494,7 @@ public final class MiniGameCommand implements CommandExecutor {
 
             case "stop":
                 if (args.length < 2) {
-                    player.sendMessage("§cMissing Args! Usage: /mg stop <game>");
+                    player.sendMessage("§cMissing Arguments! Usage: /mg stop <game>");
                     return true;
                 }
                 lobby = lobbyManager.getLobby(args[1]);
@@ -514,7 +514,7 @@ public final class MiniGameCommand implements CommandExecutor {
 
             case "ban":
                 if (args.length < 2) {
-                    player.sendMessage("§cMissing Args! Usage: /mg ban <player>");
+                    player.sendMessage("§cMissing Arguments! Usage: /mg ban <player>");
                     return true;
                 }
                 sendMGCError(player, "Banning player: " + args[1]);
@@ -531,7 +531,7 @@ public final class MiniGameCommand implements CommandExecutor {
 
             case "unban":
                 if (args.length < 2) {
-                    player.sendMessage("§cMissing Args! Usage: /mg unban <player>");
+                    player.sendMessage("§cMissing Arguments! Usage: /mg unban <player>");
                     return true;
                 }
                 sendMGCError(player, "Unbanning player: " + args[1]);
