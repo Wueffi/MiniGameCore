@@ -150,7 +150,7 @@ public final class MiniGameCommand implements CommandExecutor {
                                 player1.teleport(spawnLocation);
                             }
                             PlayerHandler.PlayerSoftReset(player1);
-                            player1.setGameMode(GameMode.SURVIVAL);
+                            player1.setGameMode(GameMode.ADVENTURE);
                             ScoreBoardManager.setPlayerStatus(player, "WAITING");
                             showTitle(player,"", "If you are ready use §a/mg ready §fto ready-up!", 0, 40, 5);
                         }
@@ -229,7 +229,7 @@ public final class MiniGameCommand implements CommandExecutor {
                                 player1.teleport(spawnLocation);
                             }
                             PlayerHandler.PlayerSoftReset(player1);
-                            player1.setGameMode(GameMode.SURVIVAL);
+                            player1.setGameMode(GameMode.ADVENTURE);
                             ScoreBoardManager.setPlayerStatus(player, "WAITING");
                             showTitle(player1,"", "If you are ready use §a/mg ready §fto ready-up!", 0, 40, 5);
                             return true;
@@ -256,7 +256,7 @@ public final class MiniGameCommand implements CommandExecutor {
                     player.teleport(spawnLocation);
                 }
                 PlayerHandler.PlayerSoftReset(player);
-                player.setGameMode(GameMode.SURVIVAL);
+                player.setGameMode(GameMode.ADVENTURE);
                 ScoreBoardManager.setPlayerStatus(player, "WAITING");
                 showTitle(player, "", "If you are ready use §a/mg ready §fto ready-up!", 0, 40, 5);
                 break;

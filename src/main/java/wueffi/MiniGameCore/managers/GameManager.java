@@ -54,6 +54,29 @@ public final class GameManager implements Listener {
         GameManager.plugin = plugin;
     }
 
+    private String getDeathVerb(DamageCause cause, boolean murder) {
+        if (murder) {
+            return "§7 was " + switch(cause) {
+                case DamageCause.PROJECTILE -> "shot";
+                case DamageCause.LAVA -> "knocked into lava";
+                case DamageCause.FALL -> "knocked off a cliff";
+                case DamageCause.VOID -> "knocked into the void";
+                case DamageCause.FIRE, DamageCause.CAMPFIRE -> "knocked into fire";
+                case DamageCause.STARVATION -> "starved";
+                default -> "killed";
+            } + " by ";
+        } else {
+            return "§7 " + switch(cause) {
+                case DamageCause.LAVA -> "fell into lava";
+                case DamageCause.FALL -> "fell off a cliff";
+                case DamageCause.VOID -> "fell into the void";
+                case DamageCause.FIRE, DamageCause.CAMPFIRE -> "burned to death";
+                case DamageCause.STARVATION -> "starved";
+                default -> "died";
+            } + ".";
+        }
+    }
+
     public static GameConfig getConfig(Lobby lobby) {
         return configCache.computeIfAbsent(lobby, l -> loadGameConfigFromWorld(l.getWorldFolder()));
     }
@@ -167,6 +190,7 @@ public final class GameManager implements Listener {
     private static void startCountdown(Lobby lobby) {
         lobby.setLobbyState("COUNTDOWN");
         GameConfig gameConfig = getConfig(lobby);
+        GameMode gameMode = gameConfig.getGameMode();
         List<Player> players = new ArrayList<>(lobby.getPlayers());
         Integer timeLimit = gameConfig.getTimeLimit();
 
@@ -238,6 +262,7 @@ public final class GameManager implements Listener {
                 } else {
                     lobby.setLobbyState("GAME");
                     for (Player player : lobby.getPlayers()) {
+                        player.setGameMode(gameMode);
                         showTitle(player, "§aGame Started!", "§cTeaming / Cheating is bannable!", 10, 70, 20);
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1.0f, 5.0f);
                         ScoreBoardManager.setPlayerStatus(player, "GAME");
@@ -306,7 +331,6 @@ public final class GameManager implements Listener {
             Location spawnLocation = newWorld.getSpawnLocation();
             player.teleport(spawnLocation);
             PlayerSoftReset(player);
-            player.setGameMode(GameMode.SURVIVAL);
         }
 
         plugin.getLogger().info("Copied and loaded world: " + newWorldName);
@@ -321,6 +345,9 @@ public final class GameManager implements Listener {
             sendMGCError(player, " Game config could not be loaded!");
             return null;
         }
+
+        player.setGameMode(GameMode.ADVENTURE);
+
         int maxPlayers = gameConfig.getMaxPlayers();
 
         Lobby lobby = lobbyManager.createLobby(gameName, maxPlayers, player, newWorldFolder);
@@ -463,7 +490,7 @@ public final class GameManager implements Listener {
         GameConfig config = getConfig(lobby);
 
         if (!config.getAllowedBreakBlocks().contains(event.getBlock().getType()) || frozenPlayers.contains(player) || lobby.getLobbyState().equals("WAITING")) {
-            sendMGCError(player, " You are not allowed to break this block!");
+            if (config.getVerbose()) sendMGCError(player, " You are not allowed to break this block!");
             event.setCancelled(true);
         }
     }
@@ -504,10 +531,14 @@ public final class GameManager implements Listener {
             GameConfig config = getConfig(lobby);
 
             Player killer = null;
-            UUID uuid = lastHit.get(player.getUniqueId());
+            UUID uuid = lastHit.remove(player.getUniqueId());
             if (uuid != null) killer = Bukkit.getPlayer(uuid);
 
             if (!config.getSilenceDeathMessages()) {
+                EntityDamageEvent damageEvent = player.getLastDamageCause();
+                DamageCause damageCause = null;
+                if (damageEvent != null) damageCause = damageEvent.getCause();
+
                 if (config.getTeams() > 0) {
                     Team team = lobby.getTeamByPlayer(player);
                     String color1 = "";
@@ -519,21 +550,21 @@ public final class GameManager implements Listener {
 
                     if (killer != null) {
                         for (Player player2 : lobby.getPlayers()) {
-                            player2.sendMessage(color1 + player.getName() + "§7 was killed by " + color2 + killer.getName() + "§7.");
+                            player2.sendMessage(color1 + player.getName() + getDeathVerb(damageCause, true) + color2 + killer.getName() + "§7.");
                         }
                     } else {
                         for (Player player2 : lobby.getPlayers()) {
-                            player2.sendMessage(color1 + player.getName() + " §7died.");
+                            player2.sendMessage(color1 + player.getName() + getDeathVerb(damageCause, false));
                         }
                     }
                 } else {
                     if (killer != null) {
                         for (Player player2 : lobby.getPlayers()) {
-                            player2.sendMessage("§a" + player.getName() + "§7 was killed by §4" + killer.getName() + "§7.");
+                            player2.sendMessage("§a" + player.getName() + getDeathVerb(damageCause, true) + "§4" + killer.getName() + "§7.");
                         }
                     } else {
                         for (Player player2 : lobby.getPlayers()) {
-                            player2.sendMessage("§a" + player.getName() + " §7died.");
+                            player2.sendMessage("§a" + player.getName() + getDeathVerb(damageCause, false));
                         }
                     }
                 }
@@ -583,7 +614,7 @@ public final class GameManager implements Listener {
                             public void run() {
                                 if (secondsLeft <= 0) {
                                     player.teleport(respawnLocation);
-                                    player.setGameMode(GameMode.SURVIVAL);
+                                    player.setGameMode(config.getGameMode());
                                     showTitle(player, "§aRespawned!", "", 10, 20, 10);
 
                                     List<Player> alive = alivePlayers.get(lobby);
@@ -616,7 +647,7 @@ public final class GameManager implements Listener {
         GameConfig config = getConfig(lobby);
 
         if (!config.getAllowedPlaceBlocks().contains(event.getBlock().getType()) || frozenPlayers.contains(player) || lobby.getLobbyState().equals("WAITING")) {
-            sendMGCError(player, " You are not allowed to place this block!");
+            if (config.getVerbose()) sendMGCError(player, " You are not allowed to place this block!");
             event.setCancelled(true);
         }
     }
@@ -652,30 +683,29 @@ public final class GameManager implements Listener {
 
         Lobby lobby = LobbyManager.getLobbyByPlayer(damager); // also checks if damager is non-null
         if (lobby == null) return;
+        GameConfig config = getConfig(lobby);
 
         if (Objects.equals(lobby.getLobbyState(), "WAITING")) {
             assert damager != null;
-            damager.sendMessage("§8[§6MiniGameCore§8]§c You are not allowed to PVP (yet)");
+            if (config.getVerbose()) damager.sendMessage("§8[§6MiniGameCore§8]§c You are not allowed to PVP (yet)");
             event.setCancelled(true);
             return;
         }
 
-        GameConfig config = getConfig(lobby);
         if (!config.getPVPMode() && Objects.equals(lobby.getLobbyState(), "GAME")) {
             event.setCancelled(true);
             assert damager != null;
-            damager.sendMessage("§8[§6MiniGameCore§8]§c You are not allowed to PVP");
+            if (config.getVerbose()) damager.sendMessage("§8[§6MiniGameCore§8]§c You are not allowed to PVP");
             return;
         }
 
         if (!config.getAllowFriendlyFire() && config.getTeams() > 0 && Objects.equals(lobby.getTeamByPlayer(damager), lobby.getTeamByPlayer(damaged))) {
             event.setCancelled(true);
             assert damager != null;
-            damager.sendMessage("§8[§6MiniGameCore§8]§c Friendly fire is not enabled for this minigame");
+            if (config.getVerbose()) damager.sendMessage("§8[§6MiniGameCore§8]§c Friendly fire is not enabled for this minigame");
             return;
         }
 
-        lastHit.remove(damaged.getUniqueId());
         assert damager != null;
         lastHit.put(damaged.getUniqueId(), damager.getUniqueId());
     }
@@ -700,7 +730,7 @@ public final class GameManager implements Listener {
             return;
         }
 
-        sendMGCError(player, " You can't open Containers yet!");
+        if (config.getVerbose()) sendMGCError(player, " You can't open Containers yet!");
         event.setCancelled(true);
     }
 
@@ -728,7 +758,7 @@ public final class GameManager implements Listener {
         GameConfig config = getConfig(lobby);
 
         if (!config.getAllowCrafting()) {
-            player.sendMessage("§7[§6MiniGameCore§7]§c You are not allowed to craft!");
+            if (config.getVerbose()) player.sendMessage("§7[§6MiniGameCore§7]§c You are not allowed to craft!");
             event.setCancelled(true);
         }
     }

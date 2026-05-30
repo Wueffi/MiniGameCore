@@ -39,6 +39,7 @@ public final class PlayerHandler implements Listener {
                 }
             }
 
+
             if (lobby.getOwner() == player) {
                 lobby.removePlayer(player);
                 for (Player player1 : lobby.getPlayers()) {
