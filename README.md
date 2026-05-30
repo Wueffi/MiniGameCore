@@ -91,6 +91,8 @@ All available options:
 | `joinPerm`               | Only players with this permission may join this game              | ❌ No (default: mgcore.join) |   
 | `doHunger`               | Whether players' hunger bars should deplete                       | ❌ No (default: false)       |
 | `allowOpeningContainers` | Allows players to open containers before the game starts          | ❌ No (default: false)       |
+| `gameMode`               | The gamemode to spawn players into once the game starts           | ❌ No (default: SURVIVAL)    |
+| `verbose`                | Send a message when a player tries do something they can't        | ❌ No (default: false)       |
 
 Example config for an 8 player Spleef-Game:
 ```

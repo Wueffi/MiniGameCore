@@ -1,5 +1,6 @@
 package wueffi.MiniGameCore.utils;
 
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -15,6 +16,7 @@ import java.util.Set;
 public final class GameConfig {
     public final boolean RespawnMode;
     public final int RespawnDelay;
+    private final GameMode gameMode;
     private final String gameName;
     private final String hostPerm;
     private final String joinPerm;
@@ -36,6 +38,7 @@ public final class GameConfig {
     private final boolean silenceDeathMessages;
     private final boolean doHunger;
     private final boolean allowOpeningContainers;
+    private final boolean verbose;
 
     public GameConfig(File configFile) {
         FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
@@ -57,6 +60,17 @@ public final class GameConfig {
         this.silenceDeathMessages = config.getBoolean("game.silenceDeathMessages", false);
         this.doHunger = config.getBoolean("game.doHunger", false);
         this.allowOpeningContainers = config.getBoolean("game.allowOpeningContainers", false);
+        this.verbose = config.getBoolean("game.verbose", false);
+
+        GameMode tempGm;
+
+        try {
+            tempGm = GameMode.valueOf(config.getString("game.gameMode", "survival").toUpperCase());
+        } catch (IllegalArgumentException ignored) {
+            tempGm = GameMode.SURVIVAL;
+        }
+
+        this.gameMode = tempGm;
 
         if (config.contains("game.spawnPoints")) {
             for (String key : config.getConfigurationSection("game.spawnPoints").getKeys(false)) {
@@ -123,6 +137,10 @@ public final class GameConfig {
 
     public @NotNull String getJoinPerm() {
         return joinPerm;
+    }
+
+    public GameMode getGameMode() {
+        return gameMode;
     }
 
     public int getMaxPlayers() {
@@ -203,6 +221,10 @@ public final class GameConfig {
 
     public boolean getAllowOpeningContainers() {
         return allowOpeningContainers;
+    }
+
+    public boolean getVerbose() {
+        return verbose;
     }
 
     public record SpawnPoint(int x, int y, int z) {
