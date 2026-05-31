@@ -160,6 +160,7 @@ public final class MiniGameCore extends JavaPlugin {
     public static void sendMGCInfo(Player player, String message) {
         player.sendMessage(Component.text()
                 .append(prefix)
+                .append(Component.text(" ", NamedTextColor.WHITE)
                 .append(Component.text(message, NamedTextColor.DARK_GREEN))
                 .build());
     }
@@ -167,6 +168,7 @@ public final class MiniGameCore extends JavaPlugin {
     public static void sendMGCError(Player player, String message) {
         player.sendMessage(Component.text()
                 .append(prefix)
+                .append(Component.text(" ", NamedTextColor.WHITE)
                 .append(Component.text(message, NamedTextColor.RED))
                 .build());
     }
