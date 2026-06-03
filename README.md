@@ -1,4 +1,6 @@
+<!-- markdownlint-disable-next-line MD041 -->
 ![Static Badge](https://img.shields.io/badge/Version-2.0.0-blue)
+
 # MiniGameCore
 
 **MiniGameCore** is a central plugin for managing minigame lobbies in Minecraft Paper Servers. It handles hosting, joining, starting, and stopping games – with animated scoreboards, statistics, and multiverse support.
@@ -12,8 +14,8 @@
 3. For permission-management, you can optionally use a plugin like [LuckPerms](https://luckperms.net/).
 4. Restart the server once.
 
-
 ---
+
 ## 📜 Commands & Permissions
 
 Aliases: `/p` for `/party` and `/tc` for `/teamchat`
