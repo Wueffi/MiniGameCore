@@ -1,4 +1,4 @@
-![Static Badge](https://img.shields.io/badge/Version-1.3.7.2-blue)
+![Static Badge](https://img.shields.io/badge/Version-2.0.0-blue)
 # MiniGameCore
 
 **MiniGameCore** is a central plugin for managing minigame lobbies in Minecraft Paper Servers. It handles hosting, joining, starting, and stopping games – with animated scoreboards, statistics, and multiverse support.
@@ -16,7 +16,7 @@
 ---
 ## 📜 Commands & Permissions
 
-Aliasses: `/p` for `/party` and `/tc` for `/teamchat`
+Aliases: `/p` for `/party` and `/tc` for `/teamchat`
 
 | Command                           | Description                                          | Permission             |
 |-----------------------------------|------------------------------------------------------|------------------------|
@@ -51,14 +51,14 @@ Plugin Configurations are located in the folder: `./plugins/MiniGameCore`. The m
 
 Example config:
 
-```txt
+```yaml
 available-games:
-- Game1
-- Game2
-- Game3
+  - Game1
+  - Game2
+  - Game3
 banned-players:
-- 2e0749e5-4ec0-4201-b58d-c4277014749c
-- 337482fe-8a15-47f6-bea5-a84918a86393
+  - 2e0749e5-4ec0-4201-b58d-c4277014749c
+  - 337482fe-8a15-47f6-bea5-a84918a86393
 keep-worlds: false
 disable-scoreboard: false
 ```
@@ -67,30 +67,35 @@ Note: if `keep-worlds: true`, the plugin is going to move them to `./plugins/Min
 
 ### Loading Game-Worlds & Configuring them
 
-The Folder for Gameworlds and configs is `./MiniGameCore`. Every Game World should be named like this: `<Game name>_world`. The world configs are named `config.yml` and should be located in the Game's world folder.
+The Folder for Gameworlds and configs is `./MiniGameCore`. Every Game World should be named like this: `<Game name>_world`. If you want multiple maps per game, name the other worlds `<Game name>_world<index>`. The world configs are named `config.yml` and should be located in the Game's world folder.
 
 All available options:
 
-| Field                   | Description                                                       | Required / Default    |
-|-------------------------|-------------------------------------------------------------------|-----------------------|
-| `name`                  | Display name of the game, e.g. in the scoreboard or at `/mg host` | ✅ Yes                 |
-| `maxPlayers`            | Maximum number of players for this game instance                  | ✅ Yes                 |
-| `teams`                 | Maximum number of teams (0 for no teams, 2-8 teams possible)      | ❌ No (default: 0)     |
-| `minPlayers`            | Minimum number of players for this game                           | ❌ No (default: 2)     |
-| `spawnPoints`           | Default spawn points for players without a team                   | ✅ Depends             |
-| `teamSpawnPoints`       | Spawn points per team (e.g. `0: [...]`, `1: [...]`)               | ✅ Depends             |
-| `inventory`             | Starting items at game start (e.g. `["WOODEN_SHOVEL"]`)           | ❌ No                  |
-| `allowed_break_blocks`  | Which blocks can be broken (e.g. `["SNOW_BLOCK"]`)                | ❌ No                  |
-| `allowed_place_blocks`  | Which blocks can be placed (e.g. `["OAK_PLANKS"]`)                | ❌ No                  |
-| `respawnMode`           | Control of respawn behavior: `"true"` or `"false"`                | ❌ No (default: false) |
-| `respawnDelay`          | Seconds delay until respawn (if enabled)                          | ❌ No (default: 0)     |
-| `doDurability`          | Control ItemDamage: `true` (vanilla) or `false`                   | ❌ No (default: true)  |
-| `allowPVP`              | Allow PVP: `true` (vanilla) or `false`                            | ❌ No (default: true)  |
-| `blocked_damage_causes` | Stop these damage causes from happening                           | ❌ No                  |
-| `timeLimit`             | Stops a game after X seconds have passed                          | ❌ No (default: 600)   |
-| `allowFriendlyFire`     | Allow members of the same team to attack each other               | ❌ No (default: false) |
-| `allowCrafting`         | Allows Players to craft items during the game                     | ❌ No (default: false) |
-| `silenceDeathMessages`  | Whether or not to silence death messages                          | ❌ No (default: false) |
+| Field                     | Description                                                       | Required / Default                           |
+|---------------------------|-------------------------------------------------------------------|----------------------------------------------|
+| `name`                    | Display name of the game, e.g. in the scoreboard or at `/mg host` | ✅ Yes                                      |
+| `maxPlayers`              | Maximum number of players for this game instance                  | ✅ Yes                                      |
+| `teams`                   | Maximum number of teams (0 for no teams, 2-8 teams possible)      | ❌ No (default: 0)                          |
+| `minPlayers`              | Minimum number of players for this game                           | ❌ No (default: 2)                          |
+| `spawnPoints`             | Default spawn points for players without a team                   | ✅ Depends                                  |
+| `teamSpawnPoints`         | Spawn points per team (e.g. `0: [...]`, `1: [...]`)               | ✅ Depends                                  |
+| `inventory`               | Starting items at game start (e.g. `["WOODEN_SHOVEL"]`)           | ❌ No                                       |
+| `allowedBreakBlocks`      | Which blocks can be broken (e.g. `["SNOW_BLOCK"]`)                | ❌ No (All blocks can be broken by default) |
+| `allowedPlaceBlocks`      | Which blocks can be placed (e.g. `["OAK_PLANKS"]`)                | ❌ No (All blocks can be placed by default) |
+| `respawnMode`             | Control of respawn behavior: `"true"` or `"false"`                | ❌ No (default: false)                      |
+| `respawnDelay`            | Seconds delay until respawn (if enabled)                          | ❌ No (default: 0)                          |
+| `doDurability`            | Control ItemDamage: `true` (vanilla) or `false`                   | ❌ No (default: true)                       |
+| `allowPVP`                | Allow PVP: `true` (vanilla) or `false`                            | ❌ No (default: true)                       |
+| `blockedDamageCauses`     | Stop these damage causes from happening                           | ❌ No                                       |
+| `timeLimit`               | Stops a game after X seconds have passed                          | ❌ No (default: 600)                        |
+| `allowFriendlyFire`       | Allow members of the same team to attack each other               | ❌ No (default: false)                      |
+| `allowCrafting`           | Allows Players to craft items during the game                     | ❌ No (default: false)                      |
+| `silenceDeathMessages`    | Whether or not to silence death messages                          | ❌ No (default: false)                      |
+| `hostPerm`                | Only players with this permission may host this game              | ❌ No (default: mgcore.host)                |
+| `joinPerm`                | Only players with this permission may join this game              | ❌ No (default: mgcore.join)                |
+| `doHunger`                | Whether players' hunger bars should deplete                       | ❌ No (default: false)                      |
+| `allowOpeningContainers`  | Allows players to open containers before the game starts          | ❌ No (default: false)                      |
+| `gameMode`                | The game mode players spawn in when the game starts               | ❌ No (default: SURVIVAL)                   |
 
 Example config for an 8 player Spleef-Game:
 
@@ -151,25 +156,25 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.ore:MiniGameCore:master-SNAPSHOT'
+    implementation 'com.github.wueffi:MiniGameCore:master-SNAPSHOT'
 }
 ```
 
-In your project, import classes/events/methods using `import ore.MiniGameCore.x`
+In your project, import classes/events/methods using `import wueffi.MiniGameCore.x`
 
 **Available Events are:** \
 `GameStartEvent` with `event.getGameName()` and `event.getLobby()` \
 `GameOverEvent` with `event.getLobby()`
 
 **Helpful MGC Classes/Interfaces are:** \
-[Lobby](https://github.com/ore/MiniGameCore/blob/master/src/main/java/ore/MiniGameCore/utils/Lobby.java) \
-[Team](https://github.com/ore/MiniGameCore/blob/master/src/main/java/ore/MiniGameCore/utils/Team.java) \
-[Winner](https://github.com/ore/MiniGameCore/blob/master/src/main/java/ore/MiniGameCore/utils/Winner.java)
+[Lobby](https://github.com/Wueffi/MiniGameCore/blob/master/src/main/java/wueffi/MiniGameCore/utils/Lobby.java) \
+[Team](https://github.com/Wueffi/MiniGameCore/blob/master/src/main/java/wueffi/MiniGameCore/utils/Team.java) \
+[Winner](https://github.com/Wueffi/MiniGameCore/blob/master/src/main/java/wueffi/MiniGameCore/utils/Winner.java)
 
 **Available API methods are:** \
-`getLobbyManager()` -> returns MiniGameCores LobbyManager instance \
+`getLobbyManager()` -> return the LobbyManager instance \
 `winPlayer(Lobby lobby, Player player)` -> let a singular Player win a game \
 `winTeam(Lobby lobby, Team team)` -> let a Team win a game \
 `playerDeath(UUID playerid)` -> notify MiniGameCore of a Players Death \
 `playerAlive(UUID playerid)` -> notify MiniGameCore of a Players Respawn \
-`getRespawnLocation(UUID playerid)` -> returns the Respawnlocation of a player
+`getRespawnLocation(UUID playerid)` -> returns the Respawn location of a player
