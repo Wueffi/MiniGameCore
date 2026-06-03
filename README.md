@@ -156,7 +156,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.wueffi:MiniGameCore:master-SNAPSHOT'
+    implementation 'com.github.Wueffi:MiniGameCore:master-SNAPSHOT'
 }
 ```
 
