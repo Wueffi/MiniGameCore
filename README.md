@@ -63,7 +63,7 @@ disable-scoreboard: false
 Note: if `keep-worlds: true`, the plugin is going to move them to `./plugins/MiniGameCore/ArchivedWorlds` instead of deleting them.
 
 ### Loading Game-Worlds & Configuring them
-The Folder for Gameworlds and configs is `./MiniGameCore`. Every Game World should be named like this: `<Game name>_world`. If you want multiple maps per game, name the other worlds `<Game name>_world<index>`. The world configs are named `config.yml` and should be located in the Game's world folder.
+The Folder for Gameworlds and configs is `./plugins/MiniGameCore/MiniGames`. Every Game World should be named like this: `<Game name>_world`. If you want multiple maps per game, name the other worlds `<Game name>_world<index>`. The world configs are named `config.yml` and should be located in the Game's world folder.
 
 All available options: 
 
