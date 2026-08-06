@@ -305,11 +305,23 @@ public final class GameManager implements Listener {
             return null;
         }
 
+        if (LobbyManager.getLobbyByPlayer(player) != null) {
+            sendMGCError(player, "You are already in a game or lobby!");
+            return null;
+        }
+
         File originalWorldFolder = matchingWorlds[new Random().nextInt(matchingWorlds.length)];
-        String newWorldName = gameName + "_copy_" + System.currentTimeMillis();
-        File newWorldFolder = new File(Bukkit.getWorldContainer(), newWorldName);
+        String newWorldName = (gameName + "_copy_" + System.currentTimeMillis()).toLowerCase(Locale.ROOT);
+
+        File newWorldFolder = new File(Bukkit.getWorldContainer(), "world/dimensions/minecraft/" + newWorldName);
+        GameConfig gameConfig;
 
         if (originalWorldFolder.exists()) {
+            gameConfig = loadGameConfigFromWorld(originalWorldFolder);
+            if (gameConfig == null) {
+                sendMGCError(player, "Game config could not be loaded!");
+                return null;
+            }
             try {
                 copyWorldFolder(originalWorldFolder, newWorldFolder);
             } catch (Exception e) {
@@ -322,7 +334,8 @@ public final class GameManager implements Listener {
             return null;
         }
 
-        World newWorld = Bukkit.createWorld(new WorldCreator(newWorldFolder.getName()));
+        NamespacedKey worldKey = NamespacedKey.fromString(newWorldName);
+        World newWorld = Bukkit.createWorld(WorldCreator.ofKey(worldKey));
 
         if (newWorld == null) {
             plugin.getLogger().warning("Failed to load copied world: " + newWorldName);
@@ -333,18 +346,9 @@ public final class GameManager implements Listener {
             PlayerSoftReset(player);
         }
 
+        newWorldFolder = newWorld.getWorldFolder();
+
         plugin.getLogger().info("Copied and loaded world: " + newWorldName);
-
-        if (LobbyManager.getLobbyByPlayer(player) != null) {
-            sendMGCError(player, "You are already in a game or lobby!");
-            return null;
-        }
-
-        GameConfig gameConfig = loadGameConfigFromWorld(newWorldFolder);
-        if (gameConfig == null) {
-            sendMGCError(player, "Game config could not be loaded!");
-            return null;
-        }
 
         newWorld.setGameRule(GameRules.LOCATOR_BAR, gameConfig.getLocatorBar());
 

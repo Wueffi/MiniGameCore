@@ -10,50 +10,51 @@ import java.io.IOException;
 import java.util.Objects;
 
 import static java.nio.file.Files.move;
-import static org.bukkit.Bukkit.getServer;
 
 public final class CleanUpWorlds {
 
     public static int worldsDeleted = 0;
-    private static final File serverDirectory = getServer().getWorldContainer();
+    private static final File gameDirectory = new File(Bukkit.getWorldContainer(), "world/dimensions/minecraft/");
 
     public static void cleanUpWorlds(MiniGameCore plugin) {
         worldsDeleted = 0;
-        for (File directory : serverDirectory.listFiles()) {
-            for (String gamename : plugin.getAvailableGames()) {
-                if (directory.isDirectory() && directory.getName().startsWith(gamename + "_copy_")) {
-                    String name = directory.getName();
-                    World world = Bukkit.getWorld(directory.getName());
+        if (gameDirectory != null) {
+            for (File directory : gameDirectory.listFiles()) {
+                for (String gamename : plugin.getAvailableGames()) {
+                    if (directory.isDirectory() && directory.getName().startsWith(gamename + "_copy_")) {
+                        String name = directory.getName();
+                        World world = Bukkit.getWorld(directory.getName());
 
-                    if (world != null) {
-                        boolean unloaded = Bukkit.unloadWorld(world, false);
-                        for (Player player : world.getPlayers()) {
-                            player.teleport(Objects.requireNonNull(Bukkit.getWorld("world")).getSpawnLocation());
+                        if (world != null) {
+                            boolean unloaded = Bukkit.unloadWorld(world, false);
+                            for (Player player : world.getPlayers()) {
+                                player.teleport(Objects.requireNonNull(Bukkit.getWorld("world")).getSpawnLocation());
+                            }
+                            if (!unloaded) {
+                                plugin.getLogger().warning("Could not unload world: " + name);
+                                return;
+                            }
                         }
-                        if (!unloaded) {
-                            plugin.getLogger().warning("Could not unload world: " + name);
+                        if (plugin.getKeepWorlds()) {
+                            File archivedDir = new File(plugin.getDataFolder(), "archivedWorlds");
+                            if (!archivedDir.exists() && !archivedDir.mkdirs()) {
+                                plugin.getLogger().severe("Could not create archive directory: " + archivedDir.getPath());
+                                return;
+                            }
+                            try {
+                                move(directory.toPath(), archivedDir.toPath());
+                                plugin.getLogger().info("Archived world: " + name);
+                            } catch (IOException e) {
+                                plugin.getLogger().severe("Failed to archive world: " + name);
+                                e.printStackTrace();
+                            }
                             return;
                         }
-                    }
-                    if (plugin.getKeepWorlds()) {
-                        File archivedDir = new File(plugin.getDataFolder(), "archivedWorlds");
-                        if (!archivedDir.exists() && !archivedDir.mkdirs()) {
-                            plugin.getLogger().severe("Could not create archive directory: " + archivedDir.getPath());
-                            return;
+                        if (!delete(directory)) {
+                            plugin.getLogger().warning("Failed to delete world folder: " + name);
                         }
-                        try {
-                            move(directory.toPath(), archivedDir.toPath());
-                            plugin.getLogger().info("Archived world: " + name);
-                        } catch (IOException e) {
-                            plugin.getLogger().severe("Failed to archive world: " + name);
-                            e.printStackTrace();
-                        }
-                        return;
+                        worldsDeleted += 1;
                     }
-                    if (!delete(directory)) {
-                        plugin.getLogger().warning("Failed to delete world folder: " + name);
-                    }
-                    worldsDeleted += 1;
                 }
             }
         }
