@@ -6,7 +6,7 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 group = 'wueffi'
-version = '2.0.1'
+version = '2.1'
 
 repositories {
     mavenCentral()
@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
+    implementation("io.papermc.paper:paper-api:26.1.2.build.53-stable")
 }
 
 tasks {
@@ -31,11 +31,11 @@ tasks {
         into 'run/plugins'
     }
     runServer {
-        version.set("1.21")
+        version.set("26.1")
     }
 }
 
-def targetJavaVersion = 21
+def targetJavaVersion = 25
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     if (JavaVersion.current() < javaVersion) {

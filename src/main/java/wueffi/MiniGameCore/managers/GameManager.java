@@ -346,7 +346,7 @@ public final class GameManager implements Listener {
             return null;
         }
 
-        newWorld.setGameRule(GameRule.LOCATOR_BAR, gameConfig.getLocatorBar());
+        newWorld.setGameRule(GameRules.LOCATOR_BAR, gameConfig.getLocatorBar());
 
         player.setGameMode(GameMode.ADVENTURE);
 
