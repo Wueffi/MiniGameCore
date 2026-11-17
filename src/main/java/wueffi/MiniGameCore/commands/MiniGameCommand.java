@@ -7,6 +7,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import wueffi.MiniGameCore.MiniGameCore;
+import wueffi.MiniGameCore.api.GameSpectateEvent;
+import wueffi.MiniGameCore.api.GameStartEvent;
 import wueffi.MiniGameCore.managers.GameManager;
 import wueffi.MiniGameCore.managers.LobbyManager;
 import wueffi.MiniGameCore.managers.PartyManager;
@@ -153,7 +155,7 @@ public final class MiniGameCommand implements CommandExecutor {
                             PlayerHandler.PlayerSoftReset(player1);
                             player1.setGameMode(GameMode.ADVENTURE);
                             ScoreBoardManager.setPlayerStatus(player, "WAITING");
-                            showTitle(player,"", "If you are ready use §a/mg ready §fto ready-up!", 0, 40, 5);
+                            showTitle(player,"", "If you are ready, run §a/mg ready", 0, 40, 5);
                         }
                     } else {
                         sendMGCError(player, "You are in a party!");
@@ -166,7 +168,7 @@ public final class MiniGameCommand implements CommandExecutor {
                 ScoreBoardManager.setPlayerStatus(player, "WAITING");
                 if (lobby == null) break;
                 lobby.setLobbyState("WAITING");
-                showTitle(player, "", "If you are ready use §a/mg ready §fto ready-up!", 0, 40, 5);
+                showTitle(player, "", "If you are ready, run §a/mg ready", 0, 40, 5);
                 break;
 
             case "join":
@@ -174,13 +176,21 @@ public final class MiniGameCommand implements CommandExecutor {
                     player.sendMessage("§cYou were banned by an Administrator.");
                     return true;
                 }
-                if (args.length < 2) {
+                int lobbies = lobbyManager.getOpenLobbies().size();
+                if (args.length < 2 && lobbies > 1) {
                     player.sendMessage("§cMissing Arguments! Usage: /mg join <game>");
                     return true;
                 }
+                if (lobbies == 0) {
+                    player.sendMessage("§cNo open lobbies!");
+                    return true;
+                }
 
-                String lobbyName = args[1];
-                lobby = lobbyManager.getLobby(lobbyName);
+                if (args.length >= 2) {
+                    lobby = lobbyManager.getLobby(args[1]);
+                } else {
+                    lobby = lobbyManager.getOpenLobbies().getFirst();
+                }
 
                 if (lobby == null) {
                     sendMGCError(player, "Lobby not found!");
@@ -233,7 +243,7 @@ public final class MiniGameCommand implements CommandExecutor {
                             PlayerHandler.PlayerSoftReset(player1);
                             player1.setGameMode(GameMode.ADVENTURE);
                             ScoreBoardManager.setPlayerStatus(player, "WAITING");
-                            showTitle(player1,"", "If you are ready use §a/mg ready §fto ready-up!", 0, 40, 5);
+                            showTitle(player1,"", "If you are ready, run §a/mg ready", 0, 40, 5);
                             return true;
                         }
                     } else {
@@ -261,7 +271,7 @@ public final class MiniGameCommand implements CommandExecutor {
                 PlayerHandler.PlayerSoftReset(player);
                 player.setGameMode(GameMode.ADVENTURE);
                 ScoreBoardManager.setPlayerStatus(player, "WAITING");
-                showTitle(player, "", "If you are ready use §a/mg ready §fto ready-up!", 0, 40, 5);
+                showTitle(player, "", "If you are ready, run §a/mg ready", 0, 40, 5);
                 break;
 
             case "confirm":
@@ -410,6 +420,14 @@ public final class MiniGameCommand implements CommandExecutor {
 
                 Player targetPlayer = Bukkit.getPlayer(target);
                 if (targetPlayer != null && targetPlayer.isOnline()) {
+                    GameSpectateEvent gameSpectateEvent = new GameSpectateEvent(player.getUniqueId(), targetPlayer.getUniqueId());
+                    Bukkit.getPluginManager().callEvent(gameSpectateEvent);
+
+                    if (gameSpectateEvent.isCancelled()) {
+                        sendMGCError(player, "You cannot spectate that user!");
+                        return true;
+                    }
+
                     sendMGCInfo(player, "You are now spectating " + targetPlayer.getName() + ".");
                     player.teleport(targetPlayer);
                     player.setGameMode(GameMode.SPECTATOR);

@@ -1,4 +1,4 @@
-![Static Badge](https://img.shields.io/badge/Version-2.1-blue)
+![Static Badge](https://img.shields.io/badge/Version-2.2.0-blue)
 # MiniGameCore
 
 **MiniGameCore** is a central plugin for managing minigame lobbies in Minecraft Paper Servers. It handles hosting, joining, starting, and stopping games – with animated scoreboards, statistics, and multiverse support.
@@ -159,7 +159,8 @@ In your project, import classes/events/methods using `import wueffi.MiniGameCore
 
 **Available Events are:** \
 `GameStartEvent` with `event.getGameName()` and `event.getLobby()` \
-`GameOverEvent` with `event.getLobby()`
+`GameOverEvent` with `event.getLobby()` \
+`GameSpectateEvent` with `event.getPlayerUUID()` and `event.getTargetUUID()`
 
 **Helpful MGC Classes are:** \
 [Lobby](https://github.com/Wueffi/MiniGameCore/blob/master/src/main/java/wueffi/MiniGameCore/utils/Lobby.java) \
@@ -171,4 +172,5 @@ In your project, import classes/events/methods using `import wueffi.MiniGameCore
 `winTeam(Lobby lobby, Team team)` -> let a Team win a game \
 `playerDeath(UUID playerid)` -> notify MiniGameCore of a Players Death \
 `playerAlive(UUID playerid)` -> notify MiniGameCore of a Players Respawn \
+`isInLobby(UUID playerid)` -> returns whether the Player is in a lobby \
 `getRespawnLocation(UUID playerid)` -> returns the Respawn location of a player

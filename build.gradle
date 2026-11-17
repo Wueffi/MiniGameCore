@@ -6,7 +6,7 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 group = 'wueffi'
-version = '2.1'
+version = '2.2.0'
 
 repositories {
     mavenCentral()
@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.papermc.paper:paper-api:26.3.build.42-alpha")
+    implementation("io.papermc.paper:paper-api:26.1.2.build.53-stable")
 }
 
 tasks {
@@ -31,7 +31,7 @@ tasks {
         into 'run/plugins'
     }
     runServer {
-        version.set("26.3")
+        version.set("26.1.2")
     }
 }
 

@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import wueffi.MiniGameCore.commands.MiniGameCommand;
@@ -169,6 +170,7 @@ public final class MiniGameCore extends JavaPlugin {
                 .append(prefix)
                 .append(Component.text(message, NamedTextColor.DARK_GREEN))
                 .build());
+        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.8f, 1.25f);
     }
 
     public static void sendMGCError(Player player, String message) {
@@ -176,9 +178,28 @@ public final class MiniGameCore extends JavaPlugin {
                 .append(prefix)
                 .append(Component.text(message, NamedTextColor.RED))
                 .build());
+        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 0.8f, 0.75f);
+    }
+
+    public static void sendMGCActionBarError(Player player, String message) {
+        player.sendActionBar(getPrefix().append(Component.text(message, NamedTextColor.RED)));
+        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 0.8f, 0.75f);
+    }
+
+    public static void sendMGCActionBarInfo(Player player, String message) {
+        player.sendActionBar(getPrefix().append(Component.text(message, NamedTextColor.GREEN)));
+        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.8f, 1.25f);
     }
 
     public static MiniGameCore getPlugin() {
         return plugin;
+    }
+
+    public static Component getPrefix() {
+        return Component.text()
+                .append(Component.text("[", NamedTextColor.DARK_GRAY))
+                .append(Component.text("MiniGameCore", NamedTextColor.GOLD))
+                .append(Component.text("] ", NamedTextColor.DARK_GRAY))
+                .build();
     }
 }

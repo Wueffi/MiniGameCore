@@ -86,7 +86,7 @@ public final class GameManager implements Listener {
 
         if (config == null) {
             for (Player player : lobby.getPlayers()) {
-                sendMGCError(player, "the game's config could not be loaded! Resetting...!");
+                sendMGCError(player, "The game's config could not be loaded! Resetting...!");
             }
             LobbyHandler.LobbyReset(lobby);
             return;
@@ -95,15 +95,8 @@ public final class GameManager implements Listener {
         int minPlayers = config.getMinPlayers();
 
         if (lobby.getPlayers().size() < minPlayers) {
-                lobby.getOwner().sendMessage("§8[§6MiniGameCore§8]§c Not enough players to start Game! (required: " + minPlayers + ")");
+                sendMGCError(lobby.getOwner(), "Not enough players to start Game! (required: " + minPlayers + ")");
                 return;
-        }
-
-        for (Player player : lobby.getPlayers()) {
-            sendMGCInfo(player, lobby.getGameName() + " is starting!");
-            lastHit.remove(player.getUniqueId()); // just to make sure
-            frozenPlayers.add(player);
-            PlayerSoftReset(player);
         }
 
         GameStartEvent gameStartEvent = new GameStartEvent(lobby.getGameName(), lobby);
@@ -116,6 +109,12 @@ public final class GameManager implements Listener {
             return;
         }
 
+        for (Player player : lobby.getPlayers()) {
+            sendMGCInfo(player, lobby.getGameName() + " is starting!");
+            lastHit.remove(player.getUniqueId()); // just to make sure
+            frozenPlayers.add(player);
+            PlayerSoftReset(player);
+        }
 
         alivePlayers.put(lobby, new ArrayList<>(lobby.getPlayers()));
         startCountdown(lobby);
@@ -502,7 +501,7 @@ public final class GameManager implements Listener {
         }
 
         if (!config.getAllowedBreakBlocks().contains(event.getBlock().getType()) || frozenPlayers.contains(player) || lobby.getLobbyState().equals("WAITING")) {
-            sendMGCError(player, "You are not allowed to break this block!");
+            sendMGCActionBarError(player, "You are not allowed to break this block!");
             event.setCancelled(true);
         }
     }
@@ -700,7 +699,7 @@ public final class GameManager implements Listener {
         }
 
         if (!config.getAllowedPlaceBlocks().contains(event.getBlock().getType()) || frozenPlayers.contains(player) || lobby.getLobbyState().equals("WAITING")) {
-            sendMGCError(player, "You are not allowed to place this block!");
+            sendMGCActionBarError(player, "You are not allowed to place this block!");
             event.setCancelled(true);
         }
     }
@@ -742,7 +741,7 @@ public final class GameManager implements Listener {
 
         if (Objects.equals(lobby.getLobbyState(), "WAITING")) {
             assert damager != null;
-            damager.sendMessage("§8[§6MiniGameCore§8]§c You are not allowed to PVP (yet)");
+            sendMGCActionBarError(damager, "You are not allowed to PVP yet");
             event.setCancelled(true);
             return;
         }
@@ -750,14 +749,14 @@ public final class GameManager implements Listener {
         if (!config.getPVPMode() && Objects.equals(lobby.getLobbyState(), "GAME")) {
             event.setCancelled(true);
             assert damager != null;
-            damager.sendMessage("§8[§6MiniGameCore§8]§c You are not allowed to PVP");
+            sendMGCActionBarError(damager, "You are not allowed to PVP in this game!");
             return;
         }
 
         if (!config.getAllowFriendlyFire() && config.getTeams() > 0 && Objects.equals(lobby.getTeamByPlayer(damager), lobby.getTeamByPlayer(damaged))) {
             event.setCancelled(true);
             assert damager != null;
-            damager.sendMessage("§8[§6MiniGameCore§8]§c Friendly fire is not enabled for this minigame");
+            sendMGCActionBarError(damager, "Friendly Fire is not enabled for this game!");
             return;
         }
 
@@ -785,7 +784,7 @@ public final class GameManager implements Listener {
         if (event.getInventory().getType().equals(InventoryType.PLAYER)) {
             return;
         }
-        sendMGCError(player, "You can't open Containers yet!");
+        sendMGCActionBarError(player, "You can't open containers yet");
         event.setCancelled(true);
     }
 
@@ -815,7 +814,7 @@ public final class GameManager implements Listener {
         if (config == null) return;
 
         if (!config.getAllowCrafting()) {
-            player.sendMessage("§7[§6MiniGameCore§7]§c You are not allowed to craft!");
+            sendMGCActionBarError(player, "You are not allowed to craft!");
             event.setCancelled(true);
         }
     }

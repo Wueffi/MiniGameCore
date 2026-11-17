@@ -1,5 +1,6 @@
 package wueffi.MiniGameCore.api;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import wueffi.MiniGameCore.managers.GameManager;
@@ -32,6 +33,10 @@ public final class MiniGameCoreAPI {
 
     public static void playerAlive(UUID playerID) {
         GameManager.playerAlive(playerID);
+    }
+
+    public static boolean isInLobby(UUID playerId) {
+        return LobbyManager.getLobbyByPlayer(Bukkit.getPlayer(playerId)) != null;
     }
 
     public static Location getRespawnLocation(UUID playerID) {
