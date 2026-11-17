@@ -310,9 +310,9 @@ public final class GameManager implements Listener {
         }
 
         File originalWorldFolder = matchingWorlds[new Random().nextInt(matchingWorlds.length)];
-        String newWorldName = (gameName + "_copy_" + System.currentTimeMillis()).toLowerCase(Locale.ROOT);
 
-        File newWorldFolder = new File(Bukkit.getWorldContainer(), "world/dimensions/minecraft/" + newWorldName);
+        String newWorldName = gameName + "_copy_" + System.currentTimeMillis();
+        File newWorldFolder = new File(Bukkit.getWorldContainer(), newWorldName);
         GameConfig gameConfig;
 
         if (originalWorldFolder.exists()) {
@@ -333,8 +333,7 @@ public final class GameManager implements Listener {
             return null;
         }
 
-        NamespacedKey worldKey = NamespacedKey.fromString(newWorldName);
-        World newWorld = Bukkit.createWorld(WorldCreator.ofKey(worldKey));
+        World newWorld = Bukkit.createWorld(new WorldCreator(newWorldFolder.getName()));
 
         if (newWorld == null) {
             plugin.getLogger().warning("Failed to load copied world: " + newWorldName);
@@ -349,7 +348,7 @@ public final class GameManager implements Listener {
 
         plugin.getLogger().info("Copied and loaded world: " + newWorldName);
 
-        newWorld.setGameRule(GameRules.LOCATOR_BAR, gameConfig.getLocatorBar());
+        newWorld.setGameRule(GameRule.LOCATOR_BAR, gameConfig.getLocatorBar());
 
         player.setGameMode(GameMode.ADVENTURE);
 
